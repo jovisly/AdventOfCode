@@ -1,4 +1,6 @@
 import itertools
+from tqdm import tqdm
+
 
 def get_patterns_and_numbers(line):
     [pattern, numbers] = line.split(" ")
@@ -6,37 +8,54 @@ def get_patterns_and_numbers(line):
     return pattern, numbers
 
 
-def get_numbers(pattern):
-    chunks = pattern.split(".")
-    chunks = [c for c in chunks if c]
-    return [len(c) for c in chunks]
+def make_template_arr(numbers):
+    """Given [2, 3], return ["", "##", ".", "###", ""].
+
+    Then we can add more "." to construct the full sequence.
+    """
+    template_arr = [""]
+    for index, number in enumerate(numbers):
+        template_arr.append("#" * number)
+        if index != len(numbers) - 1:
+            template_arr.append(".")
+
+    template_arr.append("")
+    return template_arr
 
 
-def count_num_ways(pattern, numbers):
-    # First we replace the question marks with all possibilities.
-    num_qs = pattern.count("?")
-    combs = itertools.product('#.', repeat=num_qs)
+def get_all_possible_patterns(pattern, template_arr):
+    # Number of dots we still need to allocate.
+    num_dots = len(pattern) - len("".join(template_arr))
+    # print("num_dots", num_dots)
+    # Positions where the dots can go.
+    positions = [i for i, chars in enumerate(template_arr) if "#" not in chars]
+    # print("positions", positions)
+
+    possibilities = itertools.combinations_with_replacement(positions, num_dots)
     num_valid = 0
-    for comb in combs:
-        new_pattern = pattern
-        for c in comb:
-            # Replace the first ? with the current character.
-            new_pattern = new_pattern.replace("?", c, 1)
+    for possibility in possibilities:
+        this_pattern = list(template_arr)
+        for dot in possibility:
+            this_pattern[dot] += "."
 
-        new_numbers = get_numbers(new_pattern)
-        if len(new_numbers) == len(numbers) and all([a == b for a, b in zip(new_numbers, numbers)]):
+        # Check if the pattern is valid.
+        this_pattern = "".join(this_pattern)
+        if all([c1==c2 or c1=="?" for c1, c2 in zip(pattern, this_pattern)]):
             num_valid += 1
 
     return num_valid
 
 
 
+
 def solve(filename):
     lines = open(filename, encoding="utf-8").read().splitlines()
     total = 0
-    for line in lines:
+    for line in tqdm(lines):
         pattern, numbers = get_patterns_and_numbers(line)
-        total += count_num_ways(pattern, numbers)
+        template_arr = make_template_arr(numbers)
+        total += get_all_possible_patterns(pattern, template_arr)
+
     return total
 
 
