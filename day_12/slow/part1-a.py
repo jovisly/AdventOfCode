@@ -5,9 +5,6 @@ suggest on the order of 10 ?'s, so 2^10 is 1024, which is not too bad.
 
 But, hahaha, part 2 expands the length by 5 fold, so we have 2^50, which is
 of course not gonna work.
-
-Technically I don't need to rewrite part 1. But what will work for part 2 should
-also work for part 1, so it'd be a nice check.
 """
 
 import itertools
@@ -53,7 +50,7 @@ def solve(filename):
 
 
 def mini_test():
-    filename = "input-test.txt"
+    filename = "../input-test.txt"
     # 1, 4, 1, 1, 4, 10
     assert solve(filename) == 21
 
@@ -61,7 +58,7 @@ def mini_test():
 if __name__ == "__main__":
     mini_test()
 
-    filename = "input.txt"
+    filename = "../input.txt"
     total = solve(filename)
 
     print(total)
