@@ -1,3 +1,10 @@
+"""Rotating 1000000000 cycles takes too long. Just do a few to find pattern.
+
+Then we plot the pattern:
+https://colab.research.google.com/drive/1besHCEs296eDpO7D8JO6F46w-4wnnXyo#scrollTo=B7zQBDMp6fSf
+"""
+
+
 import numpy as np
 from tqdm import tqdm
 
@@ -77,7 +84,7 @@ if __name__ == "__main__":
 
 
 
-"""Visualizing the pattern:
+"""Visualizing the pattern sample code:
 import matplotlib.pyplot as plt
 
 plt.plot(a[:30], '-o')
