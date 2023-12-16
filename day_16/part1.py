@@ -100,7 +100,7 @@ def solve(filename):
     # be hashed / deduped.
     rays = [((0, 0), "r")]
 
-    while len(rays) != 0 and step < 1000:
+    while len(rays) != 0 and step < 1200:
         step += 1
         new_rays = []
         for r in rays:
