@@ -6,7 +6,7 @@ def solve(filename):
 
 def mini_test():
     filename = "input-test.txt"
-    assert solve(filename) == 0
+    assert solve(filename) == 51
 
 
 if __name__ == "__main__":

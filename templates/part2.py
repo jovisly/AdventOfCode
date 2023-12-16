@@ -12,7 +12,7 @@ def mini_test():
 if __name__ == "__main__":
     mini_test()
 
-    filename = "input.txt"
-    total = solve(filename)
+    # filename = "input.txt"
+    # total = solve(filename)
 
-    print(total)
+    # print(total)
