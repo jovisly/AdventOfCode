@@ -40,7 +40,7 @@ def go_to_next(layout, ray):
     ):
         mapped_dir = map_dir(dir)
         new_pos = (curr_pos[0] + mapped_dir[0], curr_pos[1] + mapped_dir[1])
-        return [(new_pos, dir)]
+        return {(new_pos, dir)}
 
 
     # Scenario 2: Splitting.
@@ -48,19 +48,19 @@ def go_to_next(layout, ray):
         # Split -- one goes up and one goes down.
         pos_u = (curr_pos[0] - 1, curr_pos[1])
         pos_d = (curr_pos[0] + 1, curr_pos[1])
-        return [
+        return {
             (pos_u, "u"),
             (pos_d, "d"),
-        ]
+        }
 
     if cell == "-":
         # Split -- one goes left and one goes right.
         pos_l = (curr_pos[0], curr_pos[1] - 1)
         pos_r = (curr_pos[0], curr_pos[1] + 1)
-        return [
+        return {
             (pos_l, "l"),
             (pos_r, "r"),
-        ]
+        }
 
 
     # Scenario 3: Reflecting.
@@ -86,7 +86,7 @@ def go_to_next(layout, ray):
 
     mapped_dir = map_dir(new_dir)
     new_pos = (curr_pos[0] + mapped_dir[0], curr_pos[1] + mapped_dir[1])
-    return [(new_pos, new_dir)]
+    return {(new_pos, new_dir)}
 
 
 
@@ -95,24 +95,26 @@ def solve(filename):
     layout = [list(l) for l in lines]
 
     energized = set()
-    step = 0
+    num_energized = len(energized)
+    num_since_last_update = 0
     # The coordinate is (row, col), followed by direction. Use a tuple so it can
     # be hashed / deduped.
     rays = [((0, 0), "r")]
 
-    while len(rays) != 0 and step < 1200:
-        step += 1
+    while len(rays) != 0 and num_since_last_update < 50:
         new_rays = []
         for r in rays:
             energized.add(r[0])
             new_rays += go_to_next(layout, r)
 
-        new_rays = [r for r in new_rays if is_valid_pos(layout, r[0])]
-        # Dedupe.
-        rays = list(set(new_rays))
+        new_rays = {r for r in new_rays if is_valid_pos(layout, r[0])}
+        rays = new_rays
 
-        print("step num:", step)
-        print(len(energized))
+        if len(energized) > num_energized:
+            num_since_last_update = 0
+            num_energized = len(energized)
+        else:
+            num_since_last_update += 1
 
     return len(energized)
 

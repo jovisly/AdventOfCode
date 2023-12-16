@@ -2,21 +2,26 @@ from tqdm import tqdm
 from part1 import go_to_next, is_valid_pos
 
 
-def get_num_energized(layout, initial_pos, initial_dir, max_step=1200):
+def get_num_energized(layout, initial_pos, initial_dir, max_step=100):
     rays = [(initial_pos, initial_dir)]
     energized = set()
-    step = 0
+    num_energized = len(energized)
+    num_since_last_update = 0
 
-    while len(rays) != 0 and step < max_step:
-        step += 1
+    while len(rays) != 0 and num_since_last_update < max_step:
         new_rays = []
         for r in rays:
             energized.add(r[0])
             new_rays += go_to_next(layout, r)
 
-        new_rays = [r for r in new_rays if is_valid_pos(layout, r[0])]
-        # Dedupe.
-        rays = list(set(new_rays))
+        new_rays = {r for r in new_rays if is_valid_pos(layout, r[0])}
+        rays = new_rays
+
+        if len(energized) > num_energized:
+            num_since_last_update = 0
+            num_energized = len(energized)
+        else:
+            num_since_last_update += 1
 
     return len(energized)
 
@@ -47,7 +52,7 @@ def solve(filename):
 
     # From right column going left.
     for i in tqdm(range(len(layout))):
-        out = get_num_energized(layout=layout, initial_pos=(i, len(layout[0]) - 1), initial_dir="r")
+        out = get_num_energized(layout=layout, initial_pos=(i, len(layout[0]) - 1), initial_dir="l")
         if out > max_num_energized:
             max_num_energized = out
 
@@ -60,10 +65,9 @@ def mini_test():
 
 
 if __name__ == "__main__":
-    # mini_test()
+    mini_test()
 
     filename = "input.txt"
     total = solve(filename)
 
     print(total)
-    # 8178 is too low :(
