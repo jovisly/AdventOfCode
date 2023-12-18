@@ -21,22 +21,50 @@ def dig_edges(curr_pos, instruction):
     ]
 
 
-def collapse_row(row):
-    """Given, e.g., '###..##..#.#', returns '#.#.#.#.'."""
-    collapsed = ""
-    for c in list(row):
-        if collapsed == "":
-            collapsed += c
+def stylize_edges(dict_map, edges):
+    "Turn the edges into a stylized map."
+    for edge in edges:
+        r, c = edge
+        # There are six scenarios.
+        if (r, c - 1) in edges and (r, c + 1) in edges:
+            dict_map[(r, c)] = "═"
+        elif (r - 1, c) in edges and (r + 1, c) in edges:
+            dict_map[(r, c)] = "║"
+        elif (r, c - 1) in edges and (r + 1, c) in edges:
+            dict_map[(r, c)] = "╗"
+        elif (r, c - 1) in edges and (r - 1, c) in edges:
+            dict_map[(r, c)] = "╝"
+        elif (r, c + 1) in edges and (r + 1, c) in edges:
+            dict_map[(r, c)] = "╔"
+        elif (r, c + 1) in edges and (r - 1, c) in edges:
+            dict_map[(r, c)] = "╚"
         else:
-            if collapsed[-1] != c:
-                collapsed += c
+            print("Error: Unknown edge", edge)
 
-    return collapsed
+        # Not using this one: "╬"
+    return dict_map
 
 
-def make_map(edges, visualize=True):
+def is_inside(line):
+    return (
+        line.count("║") +
+        min(line.count("╚"), line.count("╗")) +
+        min(line.count("╔"), line.count("╝"))
+    ) % 2  == 1
+
+
+def normalize_edges(edges):
+    min_cols = min([edge[1] for edge in edges])
+    min_rows = min([edge[0] for edge in edges])
+    # Make the edges start at (0, 0)
+    return [(edge[0] - min_rows, edge[1] - min_cols) for edge in edges]
+
+
+def make_map(edges, visualize=False):
+    edges = normalize_edges(edges)
     num_cols = max([edge[1] for edge in edges]) + 1
     num_rows = max([edge[0] for edge in edges]) + 1
+
     dict_map = {}
     for row in range(num_rows):
         for col in range(num_cols):
@@ -46,16 +74,15 @@ def make_map(edges, visualize=True):
                 dict_map[(row, col)] = "."
 
     # Fill the map and count number of grids within the pool (including edge).
+    dict_map = stylize_edges(dict_map, edges)
     num_grids = 0
     for row in range(num_rows):
         for col in range(num_cols):
-            if dict_map[(row, col)] == "#":
+            if (row, col) in edges:
                 num_grids += 1
             else:
                 curr_row = "".join([dict_map[(row, col)] for col in range(col)])
-                collapsed_row = collapse_row(curr_row)
-                num_edges = collapsed_row.count("#")
-                if num_edges % 2 == 1:
+                if is_inside(curr_row):
                     dict_map[(row, col)] = "o"
                     num_grids += 1
 
@@ -96,9 +123,8 @@ def mini_test():
 if __name__ == "__main__":
     mini_test()
 
-    # filename = "input.txt"
-    # total = solve(filename)
+    filename = "input.txt"
+    total = solve(filename)
 
-    # print(total)
-    # 22619 is not right which is obvious after we visualize the map.
-    # 21321 is also not right, obviously.
+    print(total)
+
