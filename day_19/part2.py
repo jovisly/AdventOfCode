@@ -116,6 +116,10 @@ def solve(filename):
     for conditions in good_conditions:
         # This turned out to work for the test case and even for the actual data
         # set but I'm surprised. Shouldn't we subtract away "overlapped" cases?
+        # After some more thinking... ok it works because we got the conditions
+        # from the decision tree, so all the conditions are disjoint. I spent
+        # WAY TOO MUCH TIME worrying about this and only accidentally got it by
+        # giving it a go anyways.
         total += parse_good_conditions(conditions)
 
     return total
