@@ -1,5 +1,4 @@
 import copy
-import operator
 
 from part1 import process_rules
 
@@ -14,7 +13,6 @@ def process_file(filename):
 
 def get_exception_condition(condition):
     """Given, e.g., 'a>3333', return 'a<=3333'."""
-    # print("condition --- ", condition)
     symbol = ">" if ">" in condition else "<"
     exception_symbol = "<=" if ">" in condition else ">="
     subject = condition.split(symbol)[0]
@@ -29,110 +27,83 @@ def traverse_for_a(dict_rules):
     good_conditions = []
 
     while len(queue) > 0:
-        # print("~~~~~~~")
-        # print("queues", queue)
         head = queue.pop(0)
         rules= dict_rules[head["curr"]]
-        # print("rule name:", head["curr"])
-        # print("rules", rules)
 
         exception_path = []
         for rule in rules:
-            # print("  rule", rule)
+            copy_head = copy.deepcopy(head)
+
             if ">" in rule or "<" in rule:
                 condition = rule.split(":")[0]
                 result = rule.split(":")[1]
-                exception_path.append(get_exception_condition(condition))
 
                 if result == "R":
-                    continue
+                    pass
                 elif result == "A":
-                    head["path"].append(condition)
-                    good_conditions.append(head["path"])
+                    copy_head["path"] += exception_path
+                    copy_head["path"].append(condition)
+                    good_conditions.append(copy_head["path"])
                 else:
                     # Taking us to a new queue.
-                    new_queue = copy.deepcopy(head)
-                    new_queue["path"].append(condition)
-                    new_queue["curr"] = result
-                    queue.append(new_queue)
+                    copy_head["path"] += exception_path
+                    copy_head["path"].append(condition)
+                    copy_head["curr"] = result
+                    queue.append(copy_head)
 
+                # If we haven't matched the condition, add it to exception.
+                exception_path.append(get_exception_condition(condition))
             else:
                 # If we are here, this means the previous conditions need to
                 # have failed.
                 result = rule
                 if result == "R":
-                    continue
+                    pass
                 elif result == "A":
-                    head["path"] += exception_path
-                    good_conditions.append(head["path"])
+                    copy_head["path"] += exception_path
+                    good_conditions.append(copy_head["path"])
                 else:
                     # Create a new queue using exception path.
-                    new_queue = copy.deepcopy(head)
-                    new_queue["path"] += exception_path
-                    new_queue["curr"] = result
-                    queue.append(new_queue)
+                    copy_head["path"] += exception_path
+                    copy_head["curr"] = result
+                    queue.append(copy_head)
 
     return good_conditions
 
 
 
-def collapse_ranges(ranges):
-    ranges.sort(key = operator.itemgetter(0))
-    merged_ranges = []
-    for r in ranges:
-        if not merged_ranges or r[0] > merged_ranges[-1][1]:
-            merged_ranges.append(r)
-        else:
-            merged_ranges[-1][1] = max(merged_ranges[-1][1], r[1])
-    return merged_ranges
-
-
-
-def count_values_in_ranges(ranges):
-    return sum(r[1] - r[0] + 1 for r in ranges)
-
-
-def parse_good_conditions(good_conditions, rating):
-    """Go through the good rules for a rating to find the number of ways."""
+def parse_good_conditions(conditions):
+    """Go through the good rules to find the number of ways."""
     min_rating = 1
     max_rating = 4000
-    filtered_good_conditions = [
-        [r for r in rule if r.startswith(rating)]
-        for rule in good_conditions
-    ]
-    print("--- filtered ---")
-    print(filtered_good_conditions)
 
-    # for each filtered rule, we can apply it to get min and max.
-    min_max = []
-    for conditions in filtered_good_conditions:
-        dict_min_max = {"min": min_rating, "max": max_rating}
-        for condition in conditions:
-            print("condition:", condition)
-            if ">=" in condition:
-                value = int(condition.split(">=")[1])
-                dict_min_max["min"] = value
-            elif "<=" in condition:
-                value = int(condition.split("<=")[1])
-                dict_min_max["max"] = value
-            elif "<" in condition:
-                value = int(condition.split("<")[1])
-                dict_min_max["max"] = value - 1
-            elif ">" in condition:
-                value = int(condition.split(">")[1])
-                dict_min_max["min"] = value + 1
-            else:
-                raise ValueError(f"Unknown condition: {condition}")
+    min_max = {
+        c: {"min": min_rating, "max": max_rating}
+        for c in list("xmas")
+    }
 
-        if dict_min_max["min"] <= dict_min_max["max"]:
-            min_max.append([dict_min_max["min"], dict_min_max["max"]])
+    for c in conditions:
+        subject = c[0]
+        if ">=" in c:
+            value = int(c.split(">=")[1])
+            min_max[subject]["min"] = value
+        elif "<=" in c:
+            value = int(c.split("<=")[1])
+            min_max[subject]["max"] = value
+        elif "<" in c:
+            value = int(c.split("<")[1])
+            min_max[subject]["max"] = value - 1
+        elif ">" in c:
+            value = int(c.split(">")[1])
+            min_max[subject]["min"] = value + 1
+        else:
+            raise ValueError(f"Unknown condition: {c}")
 
-    print("--- min_max ---")
-    print(min_max)
-    collapsed = collapse_ranges(min_max)
-    print("--- collapsed ---")
-    print(collapsed)
-    return count_values_in_ranges(collapsed)
+    multiple = 1
+    for v in list(min_max.values()):
+        multiple *= (v["max"] - v["min"] + 1)
+
+    return multiple
 
 
 
@@ -140,18 +111,14 @@ def parse_good_conditions(good_conditions, rating):
 def solve(filename):
     dict_rules = process_file(filename)
     good_conditions = traverse_for_a(dict_rules)
-    print("good_conditions:", good_conditions)
 
-    x = parse_good_conditions(good_conditions, "x")
-    m = parse_good_conditions(good_conditions, "m")
-    a = parse_good_conditions(good_conditions, "a")
-    s = parse_good_conditions(good_conditions, "s")
-    print("x:", x)
-    print("m:", m)
-    print("a:", a)
-    print("s:", s)
-    print("product:", x * m * a * s)
-    return 167409079868000
+    total = 0
+    for conditions in good_conditions:
+        # This turned out to work for the test case and even for the actual data
+        # set but I'm surprised. Shouldn't we subtract away "overlapped" cases?
+        total += parse_good_conditions(conditions)
+
+    return total
 
 
 def mini_test():
@@ -162,12 +129,7 @@ def mini_test():
 if __name__ == "__main__":
     mini_test()
 
-    # filename = "input.txt"
-    # total = solve(filename)
+    filename = "input.txt"
+    total = solve(filename)
 
-    # print(total)
-    # Obviously we can't do this.
-    # for i in tqdm(range(4000)):
-    #     for j in range(4000):
-    #         for k in range(4000):
-    #             pass
+    print(total)
