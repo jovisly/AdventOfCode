@@ -54,9 +54,7 @@ def apply_condition(condition, input):
 def apply_rules(dict_rules, input):
     rule_name = "in"
     terminate = False
-    num_steps = 0
-    while terminate == False and num_steps <= 15:
-        num_steps += 1
+    while terminate == False:
         rule = dict_rules[rule_name]
         for condition in rule:
             terminate, result = apply_condition(condition, input)
