@@ -5,16 +5,18 @@ class FlipFlop:
         self.targets = targets
         self.state = -1
 
-    def receive_pulse(self, pulse):
-        if pulse == "l":
+    def receive_pulse(self, source, pulse):
+        if pulse == "h":
+            return []
+        else :
             self.state *= -1
-
-        self.send_pulse()
-
-    def send_pulse(self):
-        pulse = "h" if self.state == -1 else "l"
-        self.state *= -1
-        return pulse
+            return [
+                {
+                    "name": target,
+                    "source": self.name,
+                    "pulse": "h" if self.state == 1 else "l",
+                } for target in self.targets
+            ]
 
 
 class Conjunction:
@@ -25,16 +27,21 @@ class Conjunction:
         # Last pulse is keyed on the name of the source.
         self.last_pulse = {}
 
-    def receive_pulse(self, name_source, pulse):
+    def receive_pulse(self, source, pulse):
         # first update last_pulse.
-        self.last_pulse[name_source] = pulse
+        self.last_pulse[source] = pulse
         if all([True if p == "h" else False for p in self.last_pulse.values()]):
-            self.send_pulse("l")
+            pulse_to_send = "l"
         else:
-            self.send_pulse("l")
+            pulse_to_send = "h"
+        return [
+            {
+                "name": target,
+                "source": self.name,
+                "pulse": pulse_to_send,
+            } for target in self.targets
+        ]
 
-    def send_pulse():
-        pass
 
 
 class Broadcaster:
@@ -43,15 +50,14 @@ class Broadcaster:
         self.name = "broadcaster"
         self.targets = targets
 
-    def receive_and_send_pulse(self, dict_modules, pulse):
-        for target in self.targets:
-            dict_modules[target].receive_pulse(pulse)
-
-
-
-def press_button(dict_modules):
-    """Press the button to send a low pulse to the broadcaster module."""
-    dict_modules["broadcaster"].receive_and_send_pulse("l")
+    def receive_pulse(self, source, pulse):
+        return [
+            {
+                "name": target,
+                "source": self.name,
+                "pulse": pulse,
+            } for target in self.targets
+        ]
 
 
 def parse_line(line):
@@ -66,6 +72,15 @@ def parse_line(line):
         return "broadcaster", Broadcaster(targets)
 
 
+def add_pulses(queue, num_h, num_l):
+    for q in queue:
+        if q["pulse"] == "h":
+            num_h += 1
+        else:
+            num_l += 1
+    return num_h, num_l
+
+
 def solve(filename):
     lines = open(filename, encoding="utf-8").read().splitlines()
 
@@ -75,6 +90,29 @@ def solve(filename):
     }
     print("DICT MODULES")
     print(dict_modules)
+
+    # Press button.
+    # num_button_presses = 1000
+    num_button_presses = 1
+    num_h = 0
+    num_l = 0
+    queue = []
+    for _ in range(num_button_presses):
+        # Press button
+        num_l += 1
+        queue = dict_modules["broadcaster"].receive_pulse("button", "l")
+        num_h, num_l = add_pulses(queue, num_h, num_l)
+        while len(queue) > 0:
+            # Go through all the items in the queue and construct a new queue.
+            q = queue.pop()
+            new_queue = []
+            new_queue += dict_modules[q["name"]].receive_pulse(q["source"], q["pulse"])
+
+            num_h, num_l = add_pulses(q, num_h, num_l)
+
+
+
+
     return 0
 
 
