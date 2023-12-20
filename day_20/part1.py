@@ -1,3 +1,5 @@
+DEBUG = False
+
 class Queue:
     def __init__(self, name, source, pulse):
         self.name = name
@@ -31,7 +33,8 @@ class Conjunction:
     def __init__(self, name, targets):
         self.name = name
         self.targets = targets
-        # Last pulse is keyed on the name of the source.
+        # Last pulse is keyed on the name of the source. All sources need to be
+        # included.
         self.last_pulse = {}
 
     def receive_pulse(self, queue_obj):
@@ -82,6 +85,16 @@ def get_dict_modules(lines):
         else:
             dict_modules["broadcaster"] = Broadcaster(targets)
 
+    # For each conjuction, we also need to check their sources. We can do this
+    # double loop since the number of modules does not exceed 100.
+    for name, module in dict_modules.items():
+        if isinstance(module, Conjunction):
+            sources = []
+            for source_name, source_module in dict_modules.items():
+                if name in source_module.targets:
+                    sources.append(source_name)
+
+            module.last_pulse = {s: None for s in sources}
     return dict_modules
 
 
@@ -93,6 +106,27 @@ def add_pulses(queue, num_h, num_l):
         else:
             num_l += 1
     return num_h, num_l
+
+
+def print_modules_and_queue(dict_modules, queue, flag_name):
+    """Sanity check what's going on."""
+    if DEBUG == False:
+        return
+
+    print(f"======= MODULES: {flag_name} ========")
+    for name, module in dict_modules.items():
+        print(name, module.__dict__)
+    print("")
+
+    print(f"  --- QUEUE ---")
+    for q in queue:
+        print(q.__dict__)
+
+    print("")
+    print("")
+
+    return
+
 
 
 def solve(filename):
@@ -107,21 +141,25 @@ def solve(filename):
         # Press button
         num_l += 1
         queue = dict_modules["broadcaster"].receive_pulse()
+        print_modules_and_queue(dict_modules, queue, flag_name="After button press")
+
+        round_num = 1
         next_queue = []
         num_h, num_l = add_pulses(queue, num_h, num_l)
         while len(queue) > 0:
             # Go through all the items in the queue and construct a new queue.
             q = queue.pop(0)
-            if q.name in dict_modules:
+            if q.name not in dict_modules:
+                pass
+            else:
                 next_queue += dict_modules[q.name].receive_pulse(q)
 
-                if len(queue) == 0:
-                    queue = next_queue
-                    next_queue = []
-                    num_h, num_l = add_pulses(queue, num_h, num_l)
-
-    print("NUM H", num_h)
-    print("NUM L", num_l)
+            if len(queue) == 0:
+                print_modules_and_queue(dict_modules, next_queue, flag_name=f"Round {round_num}")
+                round_num += 1
+                queue = next_queue
+                next_queue = []
+                num_h, num_l = add_pulses(queue, num_h, num_l)
 
     return num_h * num_l
 
@@ -137,7 +175,7 @@ def mini_test():
 if __name__ == "__main__":
     mini_test()
 
-    # filename = "input.txt"
-    # total = solve(filename)
+    filename = "input.txt"
+    total = solve(filename)
 
-    # print(total)
+    print(total)
