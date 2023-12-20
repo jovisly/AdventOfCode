@@ -125,20 +125,26 @@ def solve(filename):
     num_button_presses = 1
     num_h = 0
     num_l = 0
-    queue = []
-    next_queue = []
+
     for _ in range(num_button_presses):
         # Press button
         num_l += 1
         queue = dict_modules["broadcaster"].receive_pulse()
+        print("=== ORIGINAL QUEUE:", queue)
+        for q in queue:
+            print("name:", q.name, "; pulse:", q.pulse)
+        next_queue = []
         num_h, num_l = add_pulses(queue, num_h, num_l)
         while len(queue) > 0:
             # Go through all the items in the queue and construct a new queue.
-            q = queue.pop()
+            q = queue.pop(0)
             next_queue += dict_modules[q.name].receive_pulse(q)
 
             if len(queue) == 0:
-                queue = [q for q in next_queue]
+                queue = next_queue
+                print("=== NEW QUEUE:", queue)
+                for q in queue:
+                    print("name:", q.name, "; pulse:", q.pulse)
                 next_queue = []
                 num_h, num_l = add_pulses(queue, num_h, num_l)
 
