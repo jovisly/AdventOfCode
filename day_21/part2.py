@@ -27,70 +27,118 @@ steps.
 There is another way. We know the area is diamond shaped, covering on top of a
 periodic grid. So we only need to calculate the number of rocks that's in a grid
 not completely covered by the diamond. All the other grids can simply be summed
-up. BUT IT IS ANNOYING TO CALCULATE THIS.
+up. BUT IT IS ANNOYING TO CALCULATE THIS. Also that still seems to be too much
+iteration.
 """
 import math
 from tqdm import tqdm
 
 from part1 import get_starting_point
+from functools import cache
 
 
-def take_one_step(layout, position):
-    """Returns positions that can be reached from the current position."""
-    set_new_pos = set()
-    for dir in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-        new_pos = (position[0] + dir[0], position[1] + dir[1])
-        # Support infinite boundary condition.
-        new_pos_mod = (new_pos[0] % len(layout), new_pos[1] % len(layout[0]))
-        if layout[new_pos_mod[0]][new_pos_mod[1]] != "#":
-            set_new_pos.add(new_pos)
+def get_row_info(layout_size, num_steps, diamond_row_num):
+    """Translates the diamond row number to the actual row number."""
+    # Remainder represents which row for the very first diamond_row_num.
+    remainder = (num_steps * 2 + 1) % layout_size
+    print("remiainder:", remainder)
+    actual_row_num = (diamond_row_num + remainder - 1) % layout_size
 
-    return set_new_pos
+    # Returns the row number between 0 and len(layout_size), and the width of
+    # the row.
+    mid = num_steps
+    diff = mid - abs(mid - diamond_row_num)
+    print("o:", actual_row_num, (diff * 2 + 1))
+    return actual_row_num, (diff * 2 + 1)
 
 
 
-def count_num_rocks(layout):
-    num_rocks = 0
-    for y in range(len(layout)):
-        for x in range(len(layout[0])):
-            if layout[y][x] == "#":
-                num_rocks += 1
+def count_even_dots(row_str, mod):
+    max_i = int(mod / 2)
+    mid_i = int((len(row_str) - 1) / 2)
+    num_dots = 0
+    for i in range(max_i):
+        j = i * 2 + 1
+        x = mid_i - j
+        y = mid_i + j
+        if row_str[x] != "#":
+            num_dots += 1
+        if row_str[y] != "#":
+            num_dots += 1
 
-    proportion = num_rocks / (len(layout) * len(layout))
-    return num_rocks, 1 - proportion
+    return num_dots
+
+
+
+def count_odd_dots(row_str, mod):
+    mid_i = int((len(row_str) - 1) / 2)
+    num_dots = 0 if row_str[mid_i] == "#" else 1
+
+    max_i = int((mod - 1) / 2)
+    for i in range(max_i):
+        j = (i + 1) * 2
+        x = mid_i - j
+        y = mid_i + j
+        if row_str[x] != "#":
+            num_dots += 1
+        if row_str[y] != "#":
+            num_dots += 1
+
+    return num_dots
+
+
+
+def count_num_extra_dots():
+    pass
+
+
+
+
+@cache
+def get_num_dots(row_str, mod, num_layout_filled):
+    if num_layout_filled > 0:
+        # If the row is filled, then we can first get the number of dots in the
+        # row, then get the mod.
+        num = num_layout_filled * get_num_dots(row_str, int((len(row_str) - 1) / 2), 0)
+        num += count_num_extra_dots(row_str, mod)
+        return num
+    else:
+        if mod % 2 == 0:
+            return count_even_dots(row_str, mod)
+        else:
+            return count_even_dots(row_str, mod)
 
 
 
 def solve(filename, num_steps):
     lines = open(filename, encoding="utf-8").read().splitlines()
     layout = [list(l) for l in lines]
-    num_rocks, proportion = count_num_rocks(layout)
-    print("rock proportion", proportion)
-    start_position = get_starting_point(layout)
+    layout_size = len(layout)
 
-    curr_positions = {start_position}
-    list_num_positions = []
-    for i in range(num_steps):
-        next_positions = set()
-        for pos in curr_positions:
-            out = take_one_step(layout, pos)
-            next_positions = next_positions.union(out)
+    print(layout)
+    return 0
 
-        curr_positions = next_positions
 
-        # list_num_positions.append()
-        list_num_positions.append(len(curr_positions) / ((i + 2) * (i + 2)))
+def tdd():
+    assert get_row_info(5, 4, 0) == (3, 1)
+    assert get_row_info(5, 4, 1) == (4, 3)
+    assert get_row_info(5, 4, 7) == (0, 3)
+    assert get_row_info(5, 1, 1) == (2, 3)
 
-    print(list_num_positions)
-    return len(curr_positions)
+    assert count_even_dots(".##.#.####.", 4) == 0
+    assert count_even_dots(".##..S####.", 4) == 1
+
+    assert count_odd_dots(".##.#.####.", 3) == 2
+    assert count_odd_dots(".##.#.####.", 5) == 2
+    assert count_odd_dots(".##..S####.", 5) == 2
 
 
 def mini_test():
     filename = "input-test.txt"
-    # assert solve(filename, num_steps=6) == 16
+    assert solve(filename, num_steps=6) == 16
     # assert solve(filename, num_steps=10) == 50
     # assert solve(filename, num_steps=50) == 1594
-    assert solve(filename, num_steps=100) == 6536
+    # assert solve(filename, num_steps=100) == 6536
     # assert solve(filename, num_steps=500) == 167004
     # assert solve(filename, num_steps=1000) == 668697
     # assert solve(filename, num_steps=5000) == 16733044
@@ -98,26 +146,8 @@ def mini_test():
 
 
 if __name__ == "__main__":
+    tdd()
     # mini_test()
 
     filename = "input.txt"
     # total = solve(filename, num_steps=26501365)
-
-    lines = open(filename, encoding="utf-8").read().splitlines()
-    layout = [list(l) for l in lines]
-    num_rocks, proportion = count_num_rocks(layout)
-
-    print("rock proportion", proportion)
-    num_steps = 26501365
-
-    area = (num_steps + 1) * (num_steps + 1)
-    print(area * proportion)
-    # 603200853774507 is too high
-
-
-    # print(total)
-
-    # That's a nope.
-    # for i in tqdm(range(26501365)):
-    #     for j in tqdm(range(26501365)):
-    #         pass
