@@ -39,16 +39,14 @@ from functools import cache
 
 def get_row_info(layout_size, num_steps, diamond_row_num):
     """Translates the diamond row number to the actual row number."""
-    # Remainder represents which row for the very first diamond_row_num.
-    remainder = (num_steps * 2 + 1) % layout_size
-    print("remiainder:", remainder)
-    actual_row_num = (diamond_row_num + remainder - 1) % layout_size
+    diamond_size = num_steps * 2 + 1
+    offset = int((layout_size - diamond_size) / 2)
+    actual_row_num = (diamond_row_num + offset) % layout_size
 
     # Returns the row number between 0 and len(layout_size), and the width of
     # the row.
     mid = num_steps
     diff = mid - abs(mid - diamond_row_num)
-    print("o:", actual_row_num, (diff * 2 + 1))
     return actual_row_num, (diff * 2 + 1)
 
 
@@ -89,6 +87,7 @@ def count_odd_dots(row_str, mod):
 
 
 def count_num_extra_dots():
+    # TODO.
     pass
 
 
