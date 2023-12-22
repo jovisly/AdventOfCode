@@ -1,7 +1,4 @@
-"""This got the right answer but very slow (10 min).
-
-We will improve it in part2 by doing better set management.
-"""
+"""This got the right answer but very slow (10 min)."""
 from tqdm import tqdm
 
 def get_brick(line):
