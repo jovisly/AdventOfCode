@@ -54,9 +54,8 @@ def process_ls(line, dict_blobs, curr_blob):
     return dict_blobs, curr_blob
 
 
-def solve(filename):
-    lines = open(filename, encoding="utf-8").read().splitlines()
 
+def get_dict_blobs(lines):
     curr_blob = None
     dict_blobs = {}
     ls_mode = False
@@ -81,12 +80,20 @@ def solve(filename):
                 queue.remove(q)
                 break
 
+    return dict_blobs
+
+
+
+def solve(filename):
+    lines = open(filename, encoding="utf-8").read().splitlines()
+    dict_blobs = get_dict_blobs(lines)
     total = 0
     for _, v in dict_blobs.items():
         if v.type == "d" and v.size <= 100000:
             total += v.size
 
     return total
+
 
 
 def mini_test():
