@@ -3,8 +3,6 @@
 So we can simply try the path length that's printed out.
 """
 import copy
-import heapq
-import uuid
 
 DIRS = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
@@ -26,13 +24,12 @@ def solve(filename):
 
     # Each queue is a complete path up until that point. When the last step of a
     # queue is the end point, move it to the completed list.
-    dict_paths = {"orig": [start]}
-    queue = [(0, "orig")]
-    completed = []
+    queue = [[start]]
+    completed = set()
     while len(queue) > 0:
-        _, q_id = heapq.heappop(queue)
-        path = dict_paths[q_id]
-        last_pos = path[-1]
+        q = queue.pop()
+        last_pos = q[-1]
+
         symbol = board[last_pos[0]][last_pos[1]]
         if symbol == "<":
             valid_dirs = [(0, -1)]
@@ -46,21 +43,15 @@ def solve(filename):
             valid_dirs = DIRS
 
         for dir in valid_dirs:
-            path_copy = copy.deepcopy(path)
+            q_copy = copy.deepcopy(q)
             next_pos = (last_pos[0] + dir[0], last_pos[1] + dir[1])
-            if is_valid(board, next_pos) and next_pos not in path_copy:
-                path_copy.append(next_pos)
+            if is_valid(board, next_pos) and next_pos not in q_copy:
+                q_copy.append(next_pos)
                 if next_pos == end:
-                    completed.append(path_copy)
-                    print("ADDED A COMPLETED PATH: ", len(path_copy) - 1)
+                    completed.add(tuple(q_copy))
+                    print("ADDED A COMPLETED PATH: ", len(q_copy) - 1)
                 else:
-                    new_id = str(uuid.uuid4())
-                    dict_paths[new_id] = path_copy
-                    heapq.heappush(queue, (-1 * len(path_copy), new_id))
-
-        # Discard this path after we've tried to explore it.
-        del dict_paths[q_id]
-
+                    queue.append(q_copy)
 
     return max([len(c) - 1 for c in completed])
 
