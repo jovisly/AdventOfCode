@@ -60,3 +60,6 @@ if __name__ == "__main__":
     # 5870 also not right.
     # 6070 also not right.
     # 6078 also not right.
+    # 6230 also not right but maybe we are getting close because "Curiously, it's the right answer for someone else"...
+
+    # 9394 is the upper bound (num cells not #)

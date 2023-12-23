@@ -1,6 +1,7 @@
-"""This is an exhaustive search that prioritizes on longer path length.
+"""This is an exhaustive search that prioritizes on (approx) longer path length.
 
-So we can simply try the path length that's printed out.
+So we can simply try the path length that's printed out. We got pretty lucky and
+the first result is the correct one.
 """
 import copy
 
