@@ -1,9 +1,8 @@
 """This is an exhaustive search that prioritizes on (approx) longer path length.
 
-So we can simply try the path length that's printed out. We got pretty lucky and
-the first result is the correct one.
+We found out, in benchmark.py, a big time sink being deepcopy. After fixing that,
+this solution completes in about a minute.
 """
-import copy
 
 DIRS = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
@@ -44,17 +43,17 @@ def solve(filename):
             valid_dirs = DIRS
 
         for dir in valid_dirs:
-            q_copy = copy.deepcopy(q)
+            q_copy = [p for p in q]
             next_pos = (last_pos[0] + dir[0], last_pos[1] + dir[1])
             if is_valid(board, next_pos) and next_pos not in q_copy:
                 q_copy.append(next_pos)
                 if next_pos == end:
-                    completed.add(tuple(q_copy))
+                    completed.add(len(q_copy) - 1)
                     print("ADDED A COMPLETED PATH: ", len(q_copy) - 1)
                 else:
                     queue.append(q_copy)
 
-    return max([len(c) - 1 for c in completed])
+    return max(completed)
 
 
 def mini_test():

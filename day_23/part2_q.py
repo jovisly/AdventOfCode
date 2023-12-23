@@ -1,0 +1,139 @@
+"""Let's try to use Q Learning to solve this problem."""
+import random
+from part1 import DIRS
+
+
+LEARNING_RATE = 0.8
+DISCOUNT_FACTOR = 0.8
+MAX_EPISODE_NUM = 10_000
+
+
+def get_board(filename):
+    """Get the board as a dictionary."""
+    lines = open(filename, encoding="utf-8").read().splitlines()
+    list_board = [list(l) for l in lines]
+    num_rows = len(list_board)
+    num_cols = len(list_board[0])
+    start = (0, 1)
+    end = (num_rows - 1, num_cols -2)
+
+    return {
+        (i, j): val
+        for i, row in enumerate(list_board)
+        for j, val in enumerate(row)
+    }, start, end
+
+
+class QLearner:
+    def __init__(self, board, start, end):
+        self.board = board
+        self.q_table = self.get_q_table()
+        self.start = start
+        self.end = end
+
+
+    def get_q_table(self):
+        """Given a board, return Q table.
+
+        States: (r, c)
+        Actions: the four possible next positions parsed down by validity.
+        """
+        q_table = {}
+        for pos, val in self.board.items():
+            if val == "#":
+                continue
+
+            next_pos = [(pos[0] + dir[0], pos[1] + dir[1]) for dir in DIRS]
+            next_pos = [p for p in next_pos if self.is_valid_position(p, {pos})]
+
+            if len(next_pos) > 0:
+                q_table[pos] = {p: 0 for p in next_pos}
+        return q_table
+
+
+    def run_one_episode(self, episode_num, max_episode_num=MAX_EPISODE_NUM):
+        curr_pos = start
+        visited = set()
+        while curr_pos != self.end and curr_pos in self.q_table and curr_pos not in visited:
+            # print("FLAG 11111")
+            # Keep moving and updating q table.
+            actions = self.q_table[curr_pos]
+            # Anneal.
+            epsilon = (1 - episode_num / max_episode_num)
+            a = self.epsilon_greedy_policy(actions, epsilon)
+            # Update q table.
+            self.update_q_table(curr_pos, a, visited)
+            # Move the agent.
+            curr_pos = a
+            visited.add(curr_pos)
+
+
+    def greedy_policy(self, actions):
+        return max(actions, key=actions.get)
+
+
+    def epsilon_greedy_policy(self, actions, epsilon):
+        if random.random() < epsilon:
+            return random.choice(list(actions))
+        else:
+            return self.greedy_policy(actions)
+
+
+    def calculate_reward(self, a, visited):
+        if not self.is_valid_position(a, visited):
+            return -10
+
+        # The position is valid. Get path length.
+        return len(visited) + 1
+
+
+    def calculate_max_reward(self, a, visited):
+        """Max reward given s and a is that we continue with greedy algo."""
+        path_length = len(visited) + 1
+        curr_pos = a
+        new_visited = {curr_pos}
+        while curr_pos != self.end and curr_pos in self.q_table and curr_pos not in new_visited:
+            # print("FLAG 22222")
+            actions = self.q_table[curr_pos]
+            a = self.greedy_policy(actions)
+            curr_pos = a
+            path_length += 1
+        return path_length
+
+
+    def update_q_table(self, s, a, visited):
+        """Update q_table following Bellman equation."""
+        prev_q = self.q_table[s][a]
+        r = self.calculate_reward(a, visited)
+        max_r = self.calculate_max_reward(a, visited)
+        self.q_table[s][a] = prev_q + LEARNING_RATE * (
+            r + DISCOUNT_FACTOR * max_r - prev_q
+        )
+
+
+    def is_valid_position(self, pos, visited):
+        if pos not in self.board:
+            return False
+
+        if pos in visited:
+            return False
+
+        return self.board[pos] != "#"
+
+
+
+if __name__ == "__main__":
+    filename = "input-test.txt"
+    dict_board, start, end = get_board(filename)
+
+    q_learner = QLearner(dict_board, start, end)
+
+    for episode_num in range(MAX_EPISODE_NUM):
+        q_learner.run_one_episode(episode_num)
+        if episode_num % 1 == 0:
+            a = (start[0] + 1, start[1])
+            max_reward = q_learner.calculate_max_reward(a, set())
+            print(f"Episode {episode_num}: max reward {max_reward}")
+
+
+    print(q_learner.q_table)
