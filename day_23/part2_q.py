@@ -53,11 +53,14 @@ class QLearner:
 
     def run_one_episode(self, episode_num, max_episode_num=MAX_EPISODE_NUM):
         curr_pos = start
-        visited = set()
-        while curr_pos != self.end and curr_pos in self.q_table and curr_pos not in visited:
-            # print("FLAG 11111")
+        visited = {start}
+        while curr_pos != self.end and curr_pos in self.q_table:
             # Keep moving and updating q table.
             actions = self.q_table[curr_pos]
+            actions = {k: v for k, v in actions.items() if self.is_valid_position(k, visited)}
+            if len(actions) == 0:
+                break
+
             # Anneal.
             epsilon = (1 - episode_num / max_episode_num)
             a = self.epsilon_greedy_policy(actions, epsilon)
@@ -84,21 +87,27 @@ class QLearner:
             return -10
 
         # The position is valid. Get path length.
-        return len(visited) + 1
+        return len(visited)
 
 
-    def calculate_max_reward(self, a, visited):
+    def calculate_max_reward(self, a, visited, debug=False):
         """Max reward given s and a is that we continue with greedy algo."""
-        path_length = len(visited) + 1
         curr_pos = a
-        new_visited = {curr_pos}
-        while curr_pos != self.end and curr_pos in self.q_table and curr_pos not in new_visited:
-            # print("FLAG 22222")
+        new_visited = {v for v in visited}
+        new_visited.add(curr_pos)
+        while curr_pos != self.end and curr_pos in self.q_table:
+            if debug:
+                print(curr_pos)
             actions = self.q_table[curr_pos]
+            actions = {k: v for k, v in actions.items() if self.is_valid_position(k, new_visited)}
+            if len(actions) == 0:
+                    break
+
             a = self.greedy_policy(actions)
             curr_pos = a
-            path_length += 1
-        return path_length
+            new_visited.add(curr_pos)
+
+        return len(new_visited) - 1 if curr_pos == self.end else -10
 
 
     def update_q_table(self, s, a, visited):
@@ -130,10 +139,11 @@ if __name__ == "__main__":
 
     for episode_num in range(MAX_EPISODE_NUM):
         q_learner.run_one_episode(episode_num)
-        if episode_num % 1 == 0:
-            a = (start[0] + 1, start[1])
-            max_reward = q_learner.calculate_max_reward(a, set())
+        if episode_num % 100 == 0:
+            max_reward = q_learner.calculate_max_reward(start, set())
             print(f"Episode {episode_num}: max reward {max_reward}")
 
 
-    print(q_learner.q_table)
+    # Final reward after training.
+    max_reward = q_learner.calculate_max_reward(start, set())
+    print("Final max reward: ", max_reward)
