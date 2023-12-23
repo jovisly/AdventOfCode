@@ -22,9 +22,10 @@ def solve(filename):
     # queue is the end point, move it to the completed list.
     queue = [[start]]
     completed = set()
-    while len(queue) > 0:
-        print("Length of queue: ", len(queue))
-        q = queue.pop(0)
+    path_found = False
+    while len(queue) > 0 and not path_found:
+        # This effectively prioritizes the longest path.
+        q = queue.pop()
         last_pos = q[-1]
         symbol = board[last_pos[0]][last_pos[1]]
         if symbol == "<":
@@ -47,6 +48,7 @@ def solve(filename):
                 q_copy.append(next_pos)
                 if next_pos == end:
                     completed.add(tuple(q_copy))
+                    print("ADDED A COMPLETED PATH: ", len(q_copy) - 1)
                 else:
                     queue.append(q_copy)
 
