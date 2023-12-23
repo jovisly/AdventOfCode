@@ -1,3 +1,8 @@
+"""This is an exhaustive search that prioritizes on longer path length.
+
+So we can simply try the path length that's printed out.
+"""
+
 import copy
 
 DIRS = [(0, 1), (1, 0), (0, -1), (-1, 0)]
@@ -40,10 +45,8 @@ def solve(filename):
             valid_dirs = DIRS
 
         for dir in valid_dirs:
-            # print("dir", dir)
             q_copy = copy.deepcopy(q)
             next_pos = (last_pos[0] + dir[0], last_pos[1] + dir[1])
-            # print("next_pos", next_pos)
             if is_valid(board, next_pos) and next_pos not in q_copy:
                 q_copy.append(next_pos)
                 if next_pos == end:
