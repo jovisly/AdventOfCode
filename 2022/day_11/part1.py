@@ -4,7 +4,7 @@ class Monkey:
         operation_type, operation_val,
     ):
         self.num = num
-        self.items = items
+        self.items = [{"orig": num + "-" + str(i), "curr": i} for i in items]
         self.divisible_test = divisible_test
         self.throw_if_true = throw_if_true
         self.throw_if_false = throw_if_false
@@ -12,25 +12,49 @@ class Monkey:
         self.operation_val = operation_val
         self.num_inspections = 0
 
-    def operate(self, reduce_worry=True):
-        if self.operation_type == "add":
-            self.items = [item + self.operation_val for item in self.items]
-        elif self.operation_type == "multiply":
-            self.items = [item * self.operation_val for item in self.items]
+    def update_item(self, item, new_val):
+        return {
+            "orig": item["orig"],
+            "curr": new_val
+        }
 
+    def operate(self, reduce_worry=True, multiplier=1):
+        if self.operation_type == "add":
+            self.items = [
+                self.update_item(item, item["curr"] + self.operation_val)
+                for item in self.items
+            ]
+        elif self.operation_type == "multiply":
+            self.items = [
+                self.update_item(item, item["curr"] * self.operation_val)
+                for item in self.items
+            ]
         elif self.operation_type == "square":
-            self.items = [item  * item for item in self.items]
+            self.items = [
+                self.update_item(item, item["curr"] * item["curr"])
+                for item in self.items
+            ]
         else:
             raise ValueError("Invalid operation type:", self.operation_type)
 
+
         # Then divide by 3, and take floor.
         if reduce_worry:
-            self.items = [item // 3 for item in self.items]
+            self.items = [
+                self.update_item(item, item["curr"] // 3)
+                for item in self.items
+            ]
+        else:
+            # Squash.
+            self.items = [
+                self.update_item(item, item["curr"] % multiplier)
+                for item in self.items
+            ]
         self.num_inspections += len(self.items)
 
     def throw_items(self, dict_monkey):
         for item in self.items:
-            if item % self.divisible_test == 0:
+            if item["curr"] % self.divisible_test == 0:
                 new_owner = self.throw_if_true
                 dict_monkey[new_owner].items.append(item)
             else:
