@@ -13,7 +13,7 @@ Some visualizations.
 
 ![2023-day18](./images/2023_day18.png)
 
-# 2022 Day 9: Rope Bridge
+## 2022 Day 9: Rope Bridge
 
 [https://adventofcode.com/2022/day/9](https://adventofcode.com/2022/day/9)
 
