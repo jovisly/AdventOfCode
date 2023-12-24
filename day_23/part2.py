@@ -5,8 +5,8 @@ So we can simply try the path length that's printed out.
 This takes even longer than Part 1 as expected, and the first answer is not the
 correct one.
 """
-import copy
 from part1 import is_valid, DIRS
+
 
 def solve(filename):
     lines = open(filename, encoding="utf-8").read().splitlines()
@@ -20,24 +20,22 @@ def solve(filename):
     # queue is the end point, move it to the completed list.
     queue = [[start]]
     completed = set()
-    path_found = False
-    while len(queue) > 0 and not path_found:
-        # This effectively prioritizes the longest path.
+    while len(queue) > 0:
         q = queue.pop()
         last_pos = q[-1]
 
         for dir in DIRS:
-            q_copy = copy.deepcopy(q)
+            q_copy = [p for p in q]
             next_pos = (last_pos[0] + dir[0], last_pos[1] + dir[1])
             if is_valid(board, next_pos) and next_pos not in q_copy:
                 q_copy.append(next_pos)
                 if next_pos == end:
-                    completed.add(tuple(q_copy))
+                    completed.add(len(q_copy) - 1)
                     print("ADDED A COMPLETED PATH: ", len(q_copy) - 1)
                 else:
                     queue.append(q_copy)
 
-    return max([len(c) - 1 for c in completed])
+    return max(completed)
 
 
 
@@ -61,5 +59,6 @@ if __name__ == "__main__":
     # 6070 also not right.
     # 6078 also not right.
     # 6230 also not right but maybe we are getting close because "Curiously, it's the right answer for someone else"...
-
+    # 6266 is not right.
+    # 6418 is still not right and "Curiously, it's the right answer for someone else"...
     # 9394 is the upper bound (num cells not #)
