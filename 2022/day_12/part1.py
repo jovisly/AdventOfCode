@@ -34,6 +34,42 @@ def map_dir(dir):
 
 
 
+def get_min_path_dijkstra(dict_board, start, end):
+    path_cost = {n: float("inf") for n in list(dict_board)}
+    path_cost[start] = dict_board[start]
+
+    prev_node = {n: None for n in list(dict_board)}
+
+    # Queue is (cost, (i, j))
+    queue = [(0, start)]
+
+    while len(queue) > 0:
+        cost, curr_pos = heapq.heappop(queue)
+
+        if cost > path_cost[curr_pos]:
+            continue
+
+        for dir in ["r", "l", "u", "d"]:
+            next_pos = (
+                curr_pos[0] + map_dir(dir)[0],
+                curr_pos[1] + map_dir(dir)[1]
+            )
+            if next_pos not in dict_board:
+                continue
+
+            if dict_board[next_pos] > dict_board[curr_pos] + 1:
+                continue
+
+            new_cost = cost + 1
+            if new_cost < path_cost[next_pos]:
+                path_cost[next_pos] = new_cost
+                prev_node[next_pos] = curr_pos
+                heapq.heappush(queue, (new_cost, next_pos))
+
+    return path_cost[end]
+
+
+
 def solve(filename):
     lines = open(filename, encoding="utf-8").read().splitlines()
     board = [list(l) for l in lines]
@@ -41,37 +77,7 @@ def solve(filename):
 
     # Turn it into a dictionary keyed on (i, j):
     dict_board = {(i, j): map_letter_to_num(val) for i, row in enumerate(board) for j, val in enumerate(row)}
-
-    # Each queue is (cost, i, j, curr_dir)
-    queue = [(0, *start, "r"), (0, *start, "d"), (0, *start, "l"), (0, *start, "u")]
-    visited = set()
-
-    while len(queue) > 0:
-        cost, i, j, curr_dir = heapq.heappop(queue)
-
-        if (i, j, curr_dir) in visited:
-            continue
-        else:
-            visited.add((i, j, curr_dir))
-
-        next_pos = (i + map_dir(curr_dir)[0], j + map_dir(curr_dir)[1])
-        if next_pos not in dict_board:
-            continue
-        # We can only visit the next position if it's only one more than the current position.
-        if dict_board[next_pos] > dict_board[(i, j)] + 1:
-            continue
-
-        new_cost = cost + dict_board[next_pos]
-        print("*** next_pos:", next_pos, curr_dir)
-        if next_pos == end:
-            print("new_cost:", new_cost)
-            return new_cost
-
-        for next_dir in ["r", "l", "u", "d"]:
-            heapq.heappush(queue, (new_cost, *next_pos, next_dir))
-
-    print("WARNING: No path found.")
-    return 0
+    return get_min_path_dijkstra(dict_board, start, end)
 
 
 def mini_test():
@@ -82,7 +88,7 @@ def mini_test():
 if __name__ == "__main__":
     mini_test()
 
-    # filename = "input.txt"
-    # total = solve(filename)
+    filename = "input.txt"
+    total = solve(filename)
 
-    # print(total)
+    print(total)
