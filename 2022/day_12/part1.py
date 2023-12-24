@@ -12,7 +12,7 @@ def map_letter_to_num(letter):
     return ord(letter) - ord("a") + 1
 
 
-def fine_start_end(board):
+def find_start_end(board):
     start = None
     end = None
     for i, row in enumerate(board):
@@ -117,7 +117,7 @@ def draw_board(dict_board, full_path):
 def solve(filename):
     lines = open(filename, encoding="utf-8").read().splitlines()
     board = [list(l) for l in lines]
-    start, end = fine_start_end(board)
+    start, end = find_start_end(board)
 
     # Turn it into a dictionary keyed on (i, j):
     dict_board = {(i, j): val for i, row in enumerate(board) for j, val in enumerate(row)}
