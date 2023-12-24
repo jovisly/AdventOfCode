@@ -1,6 +1,7 @@
 """Let's try to use Q Learning to solve this problem.
 
-This works but also very slow. Slower than exhaustive search.
+This works for test data but very slow. Slower than exhaustive search. It also
+is not helpful at all with the actual dataset.
 """
 import random
 from part1 import DIRS
@@ -135,14 +136,14 @@ class QLearner:
 
 
 if __name__ == "__main__":
-    filename = "input.txt"
+    filename = "input-test.txt"
     dict_board, start, end = get_board(filename)
 
     q_learner = QLearner(dict_board, start, end)
 
     for episode_num in range(MAX_EPISODE_NUM):
         q_learner.run_one_episode(episode_num)
-        if episode_num % 1 == 0:
+        if episode_num % 100 == 0:
             max_reward = q_learner.calculate_max_reward(start, set())
             print(f"Episode {episode_num}: max reward {max_reward}")
 
