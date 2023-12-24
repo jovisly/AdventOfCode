@@ -13,6 +13,12 @@ Some visualizations.
 
 ![2023-day18](./images/2023_day18.png)
 
+## 2022 Day 12: Hill Climbing Algorithm
+
+[https://adventofcode.com/2022/day/12](https://adventofcode.com/2022/day/12)
+
+![2022-day12](./images/2022_day12.png)
+
 ## 2022 Day 9: Rope Bridge
 
 [https://adventofcode.com/2022/day/9](https://adventofcode.com/2022/day/9)
