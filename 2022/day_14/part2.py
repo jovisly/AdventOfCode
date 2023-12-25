@@ -3,11 +3,11 @@ import curses
 from utils import parse_line, fill_rocks
 from viz import render_rocks, update_sand
 
-VIZ = True
+VIZ = False
 
 def move_sand(stdscr, x, y, new_pos, num):
     if VIZ:
-        time.sleep(0.001)
+        time.sleep(0.05)
         update_sand(stdscr, (x, y), new_pos, num)
     return new_pos
 
@@ -58,11 +58,17 @@ def solve(filename, stdscr):
         render_rocks(stdscr, filled_rocks, max_y)
 
     all_sands = set()
+    # Add "rocks" that are floors to all_rocks. Doesn't have to be precise.
+    len_floor = 2 * (max_y + 6)
+    for x in range(500 - len_floor // 2, 500 + len_floor // 2):
+        all_rocks.add((x, max_y + 2))
+
     while True:
-        sand_pos = make_one_sand(stdscr, all_rocks, all_sands, max_y)
+        sand_pos = make_one_sand(stdscr, all_rocks, all_sands, max_y + 2)
         if sand_pos is None:
             break
         all_sands.add(sand_pos)
+        print(len(all_sands))
 
     return len(all_sands)
 

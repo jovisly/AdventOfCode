@@ -21,6 +21,8 @@ Here are some visualizations.
 
 https://github.com/jovisly/AoC-2023/assets/99686932/fca9b110-9088-46e2-86af-4654675b0499
 
+https://github.com/jovisly/AoC-2023/assets/99686932/03b0aed5-b900-4ba9-870d-2e5cdcc4a32e
+
 ## 2022 Day 12: Hill Climbing Algorithm
 
 [https://adventofcode.com/2022/day/12](https://adventofcode.com/2022/day/12)
