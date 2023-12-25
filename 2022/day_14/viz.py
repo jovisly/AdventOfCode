@@ -1,22 +1,22 @@
 import curses
 
 # For test dataset.
-# X_OFFSET = 486
-# Y_OFFSET = 4
+X_OFFSET = 486
+Y_OFFSET = 4
 
-# MIN_X = 490
-# MAX_X = 505
-# MIN_Y = 0
-# MAX_Y = 10
+MIN_X = 490
+MAX_X = 505
+MIN_Y = 0
+MAX_Y = 10
 
 # For real dataset.
-X_OFFSET = 407
-Y_OFFSET = 0
+# X_OFFSET = 407
+# Y_OFFSET = 0
 
-MIN_X = 409
-MAX_X = 518
-MIN_Y = 0
-MAX_Y = 170
+# MIN_X = 409
+# MAX_X = 518
+# MIN_Y = 0
+# MAX_Y = 170
 
 
 def render_rocks(stdscr, rocks, min_x=MIN_X, max_x=MAX_X, min_y=MIN_Y, max_y=MAX_Y):
@@ -59,12 +59,16 @@ def update_sand(stdscr, old_pos, new_pos, num_sand, min_x=MIN_X, max_x=MAX_X, mi
     x, y = new_pos
     stdscr.addstr(y + Y_OFFSET, x - X_OFFSET, "O", curses.color_pair(2) | curses.A_BOLD)
 
+    # stdscr.addstr(
+    #     screen_y // 4,
+    #     max_x - X_OFFSET + 2,
+    #     f"Num sand: {num_sand}"
+    # )
     stdscr.addstr(
-        screen_y // 4,
+        y + Y_OFFSET + 4,
         max_x - X_OFFSET + 2,
         f"Num sand: {num_sand}"
     )
-
     stdscr.refresh()
 
 

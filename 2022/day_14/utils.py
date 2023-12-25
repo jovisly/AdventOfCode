@@ -55,8 +55,9 @@ def get_dimension(filename):
     print(f"min_x: {min_x}")
 
 
-get_dimension("input-test.txt")
-print("#" * 80)
-get_dimension("input.txt")
+if __name__ == "__main__":
+    get_dimension("input-test.txt")
+    print("#" * 80)
+    get_dimension("input.txt")
 
 
