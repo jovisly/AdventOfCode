@@ -9,9 +9,17 @@ Some visualizations.
 
 ## 2023 Day 18: Lavaduct Ladgoon
 
-[https://adventofcode.com/2023/day/18](https://adventofcode.com/2023/day/18).
+[https://adventofcode.com/2023/day/18](https://adventofcode.com/2023/day/18)
 
 ![2023-day18](./images/2023_day18.png)
+
+## 2022 Day 14: Regolith Reservoir
+
+[https://adventofcode.com/2022/day/14](https://adventofcode.com/2022/day/14)
+
+![2022-day14](./images/2022_day14.png)
+
+https://github.com/jovisly/AoC-2023/assets/99686932/fca9b110-9088-46e2-86af-4654675b0499
 
 ## 2022 Day 12: Hill Climbing Algorithm
 

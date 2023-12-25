@@ -3,7 +3,7 @@ import time
 import curses
 from viz import render_rocks, update_sand
 
-VIZ = True
+VIZ = False
 
 
 def parse_line(line):
@@ -123,4 +123,10 @@ def main(stdscr):
     stdscr.getch()
 
 
-curses.wrapper(main)
+
+if VIZ:
+    curses.wrapper(main)
+else:
+    filename = "input.txt"
+    out = solve(filename, stdscr=None)
+    print(out)
