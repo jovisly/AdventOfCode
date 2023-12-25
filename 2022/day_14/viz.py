@@ -1,13 +1,13 @@
 import curses
 
 # For test dataset.
-X_OFFSET = 486
+X_OFFSET = 476
 Y_OFFSET = 4
 
-MIN_X = 490
-MAX_X = 505
-MIN_Y = 0
-MAX_Y = 10
+MIN_X = 480
+MAX_X = 516
+MIN_Y = -1
+MAX_Y = 12
 
 # For real dataset.
 # X_OFFSET = 407
@@ -19,7 +19,7 @@ MAX_Y = 10
 # MAX_Y = 170
 
 
-def render_rocks(stdscr, rocks, min_x=MIN_X, max_x=MAX_X, min_y=MIN_Y, max_y=MAX_Y):
+def render_rocks(stdscr, rocks, rocks_max_y, min_x=MIN_X, max_x=MAX_X, min_y=MIN_Y, max_y=MAX_Y):
     stdscr.clear()
     screen_y, screen_x = stdscr.getmaxyx()
 
@@ -40,6 +40,16 @@ def render_rocks(stdscr, rocks, min_x=MIN_X, max_x=MAX_X, min_y=MIN_Y, max_y=MAX
             if x - X_OFFSET >= screen_x:
                 continue
             stdscr.addstr(y + Y_OFFSET, x - X_OFFSET, "#", curses.color_pair(1) | curses.A_BOLD)
+
+    # Add floor. Only relevant for part 2.
+    for x in range(min_x, max_x + 1):
+        y = rocks_max_y + 2
+        if y + Y_OFFSET >= screen_y:
+            continue
+        if x - X_OFFSET >= screen_x:
+            continue
+        stdscr.addstr(y + Y_OFFSET, x - X_OFFSET, "#", curses.color_pair(1) | curses.A_BOLD)
+
 
     stdscr.refresh()
 
@@ -65,8 +75,8 @@ def update_sand(stdscr, old_pos, new_pos, num_sand, min_x=MIN_X, max_x=MAX_X, mi
     #     f"Num sand: {num_sand}"
     # )
     stdscr.addstr(
-        y + Y_OFFSET + 4,
-        max_x - X_OFFSET + 2,
+        max_y + Y_OFFSET + 2,
+        min_x - X_OFFSET + 0,
         f"Num sand: {num_sand}"
     )
     stdscr.refresh()

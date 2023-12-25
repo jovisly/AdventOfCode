@@ -53,11 +53,18 @@ def solve(filename, stdscr):
         for pos in r:
             all_rocks.add(pos)
 
+    max_y = max([r[1] for r in all_rocks])
     if VIZ:
-        render_rocks(stdscr, filled_rocks)
+        render_rocks(stdscr, filled_rocks, max_y)
 
+    all_sands = set()
+    while True:
+        sand_pos = make_one_sand(stdscr, all_rocks, all_sands, max_y)
+        if sand_pos is None:
+            break
+        all_sands.add(sand_pos)
 
-    return 0
+    return len(all_sands)
 
 
 def main(stdscr):
