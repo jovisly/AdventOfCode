@@ -1,14 +1,16 @@
 """
+Time: 45m (with a pretty big hint)
+
 Bug report:
 
-Part 2 was a bit more challenging. I kept trying to figure out a way to identify
-"inside" the cubes, but got nowhere. I was also very worried about complex cubes
-topology like winding tunnels inside the cubes. Finally I got a hint to "think
-outside the box".
+I kept trying to figure out a way to identify "inside" the cubes, but got
+nowhere. I was also very worried about complex cubes topology like winding
+tunnels inside the cubes. Finally I got a hint to "think outside the box", which
+helpfully took my attention to the outside, instead of inside.
 
 After getting the list of "outside" positions, I got the wrong answer. This was
-caused by not having a buffer around the min and max positions, which caused
-some valid outside positions to be missed. After adding buffer, it worked just
+caused by not having a buffer around the min and max positions, meaning there're
+some valid outside positions being missed. After adding buffer, it worked just
 fine.
 
 My implementation is very straightforward and not optimized. For the actual

@@ -1,3 +1,9 @@
+"""
+Time: ...
+
+Bug report: ...
+"""
+
 def solve(filename):
     lines = open(filename, encoding="utf-8").read().splitlines()
     # Stuff here.

@@ -1,11 +1,10 @@
 """
+Time: 15m
+
 Bug report:
 
-This one is not too bad and took about 15 minutes. But I did create a bug where
-I was only checking cj[0] == ci[0] + 1 without imposing that the other two
-coordinates were the same.
-
-Since the actual data set was about 3k lines, I went with a simple n x n check.
+Originally I was only checking cj[0] == ci[0] + 1 without imposing that the
+other two coordinates were the same, which lead to the wrong answer.
 """
 from tqdm import tqdm
 
