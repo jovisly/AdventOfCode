@@ -1,7 +1,7 @@
 """
 Time: 5 minutes.
 
-Reflections: Ok I guess the plain I went through with Part 1 manipulating the
+Reflections: Ok I guess the pain I went through with Part 1 manipulating the
 index values was worthwhile, since that approach doesn't incur any additional
 time penalty for Part 2, when each number is a lot bigger. There is the 10X
 penalty for the extra rounds of mixing, but that's not too bad.
