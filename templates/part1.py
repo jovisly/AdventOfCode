@@ -5,6 +5,7 @@ Reflections: ...
 
 Bug report: ...
 """
+import utils
 
 def solve(filename):
     lines = open(filename, encoding="utf-8").read().splitlines()
