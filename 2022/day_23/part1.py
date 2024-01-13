@@ -2,7 +2,7 @@
 Time: 40 minutes
 
 Reflections: Not too bad and another board question. Except this time also the
-diagonal directions. I was a bit confused with the instrution which does not
+diagonal directions. I was a bit confused with the instruction which does not
 specify what to do if there's no valid moves -- it was not explicitly stated that
 do nothing in such case.
 """
