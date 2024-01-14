@@ -8,6 +8,9 @@ it manually but it was still slow (because I'm calculating from scratch again).
 So I cached it better, then it was still not finishing. Printing out the position,
 I saw that I was dealing with a lot of dupes. Keeping track of "visited" fixed that
 and got me an answer that was however off by 1.
+
+Wait actually I didn't have off-by-1 error. I had "printing the wrong thing"
+error. Now THIS is a bug report.
 """
 import heapq
 import utils
@@ -60,7 +63,6 @@ def move_blizzard(blizzard, num_rows, num_cols):
 
 def get_blizzards_at_t(blizzards, t, num_rows, num_cols):
     """Returns the blizzards at time t."""
-    print("WE ARE DOING THIS EXPENSIVE FUNCTION")
     new_blizzards = []
     for b in blizzards:
         new_b = tuple(b)
@@ -109,7 +111,7 @@ def solve(filename):
         cost, curr_pos = heapq.heappop(queue)
 
         if curr_pos == end:
-            print("Found a path with cost: ", cost)
+            print("Found a path with cost: ", cost - 1)
             return cost - 1
 
         num_iters += 1
@@ -165,7 +167,7 @@ def mini_test():
 
 
 if __name__ == "__main__":
-    mini_test()
+    # mini_test()
 
     # Reset the global dictionaries after test and reset cache.
     filename = "input.txt"
