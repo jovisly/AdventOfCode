@@ -1,6 +1,6 @@
 ## Advent of Code
 
-My solutions to the [Advent of Code 2023](https://adventofcode.com/2023) puzzles.
+My solutions to the [Advent of Code](https://adventofcode.com/) puzzles.
 
 I learned about Advent of Code in December 2023 while at [Recurse Center](https://www.recurse.com/). Now I'm a huge fan. I've also started to work on puzzles from
 earlier years.
