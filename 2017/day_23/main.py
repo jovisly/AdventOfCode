@@ -1,10 +1,6 @@
-"""
-Time: ...
-
-Reflections: ...
-
-Bug report: ...
-"""
+# Problem type:
+# ~~~~~~~~~~~~ follow instruction (part 1) ~~~~~~~~~~~~
+# ~~~~~~~~~~~~ wow really need to think!!! (part 2) ~~~~~~~~~~~~
 from collections import defaultdict
 
 filename = "input.txt"
