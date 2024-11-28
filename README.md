@@ -2,8 +2,7 @@
 
 My solutions to the [Advent of Code](https://adventofcode.com/) puzzles.
 
-I learned about Advent of Code in December 2023 while at [Recurse Center](https://www.recurse.com/). Now I'm a huge fan. I've also started to work on puzzles from
-earlier years.
+I [learned about Advent of Code in December 2023](https://www.unicornds.org/why-data-scientists-should-try-advent-of-code/) while at [Recurse Center](https://www.recurse.com/). Now I'm a huge fan. I've also started to work on puzzles from earlier years.
 
 Here are some visualizations.
 
