@@ -142,8 +142,6 @@ def get_num_sides(block):
     """
     # Find cells that are on the edge of the block, i.e., they are missing any neightbor.
     # Track also which neighbor they are missing.
-    # "dir" here is not strictly the normal direction but as long as we are consistent
-    # it should be fine.
     # Note, one position can show up multiple times in edge_cells_with_directions.
     # And the length of edge_cells_with_directions is in fact the perimeter of the block.
     edge_cells_with_directions = set()
