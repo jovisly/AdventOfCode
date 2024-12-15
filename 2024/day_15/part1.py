@@ -1,10 +1,3 @@
-"""
-Time: ...
-
-Reflections: ...
-
-Bug report: ...
-"""
 import utils
 
 filename = "input.txt"

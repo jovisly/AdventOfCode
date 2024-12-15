@@ -1,11 +1,11 @@
 def map_dir(dir):
-    if dir == "R":
+    if dir == "R" or dir == "E" or dir == ">":
         return (0, 1)
-    elif dir == "L":
+    elif dir == "L" or dir == "W" or dir == "<":
         return (0, -1)
-    elif dir == "U":
+    elif dir == "U" or dir == "N" or dir == "^":
         return (-1, 0)
-    elif dir == "D":
+    elif dir == "D" or dir == "S" or dir == "v":
         return (1, 0)
     else:
         raise ValueError(f"Unknown direction: {dir}")

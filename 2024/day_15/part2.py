@@ -1,19 +1,47 @@
 """
-Time: ...
-
-Reflections: ...
-
-Bug report: ...
+Reflections: OOOOOFFFFSSSS... Reminds me of the 3D tetris question from last year
+which I also really struggled.
 """
+from dataclasses import dataclass
 import utils
 
 filename = "input.txt"
-filename = "input-test.txt"
-filename = "input-test2.txt"
-filename = "input-test3.txt"
+# filename = "input-test.txt"
+# filename = "input-test2.txt"
+# filename = "input-test3.txt"
 lines = open(filename, encoding="utf-8").read().split("\n\n")
 board = lines[0].splitlines()
 moves = [m for m in list(lines[1]) if len(m.strip()) > 0]
+
+
+@dataclass
+class Box:
+    left: tuple[int, int]
+    right: tuple[int, int]
+
+    def contains_pos(self, pos: tuple[int, int]) -> bool:
+        return pos in (self.left, self.right)
+
+    def move(self, dir: str) -> None:
+        self.left = utils.move_to_dir(self.left, dir)
+        self.right = utils.move_to_dir(self.right, dir)
+
+
+
+def get_boxes(dict_board) -> list[Box]:
+    boxes = []
+    processed = set()
+
+    for pos, val in dict_board.items():
+        if val == "[" and pos not in processed:
+            right_pos = (pos[0], pos[1] + 1)
+            assert dict_board[right_pos] == "]"
+            boxes.append(Box(left=pos, right=right_pos))
+            processed.add(pos)
+            processed.add(right_pos)
+
+    return boxes
+
 
 
 def expand_board(board):
@@ -60,8 +88,7 @@ def get_dir(move):
         dir = "L"
     return dir
 
-
-def one_move(dict_board, robot_pos, move):
+def one_move(dict_board, robot_pos, move, boxes: list[Box]):
     dir = get_dir(move)
     next_pos = utils.move_to_dir(robot_pos, dir)
     if next_pos not in dict_board:
@@ -74,52 +101,58 @@ def one_move(dict_board, robot_pos, move):
         dict_board[next_pos] = "@"
         dict_board[robot_pos] = "."
         return dict_board
-    # Interesting scenario. If the next position is a box, we need to check if we
-    # can move it to the next position. But we need to do this check for everything
-    # along the way.
-    if next_val == "[" or next_val == "]":
-        queue_to_move = [next_pos]
 
-        # Look for everything that needs to be moved.
-        while True:
-            # print("queue_to_move", queue_to_move)
-            this_pos = queue_to_move[-1]
-            next_pos = utils.move_to_dir(this_pos, dir)
-            next_val = dict_board[next_pos]
-            if next_val == "[" or next_val == "]":
-                # Another box! Then we need to consider this box again.
-                queue_to_move.append(next_pos)
-            elif next_val == "#":
-                # Ran into a wall!  Then we can't move.
-                queue_to_move = []
-                break
-            else:
-                break
+    # Handle box pushing
+    if next_val in ["[", "]"]:
+        boxes_to_move = []
+        positions_to_check = [next_pos]
+        checked_positions = set()  # Keep track of what we've checked
 
-        # Now we have to move all the boxes in reverse order.
-        if len(queue_to_move) > 0:
-            for pos in reversed(queue_to_move):
-                val = dict_board[pos]
-                next_pos = utils.move_to_dir(pos, dir)
-                dict_board[next_pos] = val
-                dict_board[pos] = "."
+        while positions_to_check:
+            current_pos = positions_to_check.pop(0)
+            if current_pos in checked_positions:
+                continue
+            checked_positions.add(current_pos)
 
-                # If direction is up or down, we also need to move the other side of
-                # the box. How do we find the other side of the box?
-                if dir == "U" or dir == "D":
-                    if val == "[":
-                        other_side_pos = (pos[0], pos[1] + 1)
-                    if val == "]":
-                        other_side_pos = (pos[0], pos[1] - 1)
-                    other_side_next_pos = utils.move_to_dir(other_side_pos, dir)
-                    other_side_val = dict_board[other_side_next_pos]
-                    print("other_side_val", other_side_val)
-                    dict_board[other_side_next_pos] = val
-                    dict_board[other_side_pos] = "."
+            # Find which box this position belongs to
+            for box in boxes:
+                if box.contains_pos(current_pos):
+                    if box not in boxes_to_move:
+                        boxes_to_move.append(box)
+                        # Check next positions for both sides of the box
+                        next_left = utils.move_to_dir(box.left, dir)
+                        next_right = utils.move_to_dir(box.right, dir)
 
-            # Robot should move to the first of the box.
-            dict_board[queue_to_move[0]] = "@"
-            dict_board[robot_pos] = "."
+                        # Check both next positions
+                        for next_check in [next_left, next_right]:
+                            if next_check not in checked_positions:
+                                if dict_board[next_check] in ["[", "]"]:
+                                    positions_to_check.append(next_check)
+                                elif dict_board[next_check] == "#":
+                                    return dict_board  # Can't move if any part hits a wall
+
+        # Verify all moves are valid before making any changes
+        for box in boxes_to_move:
+            next_left = utils.move_to_dir(box.left, dir)
+            next_right = utils.move_to_dir(box.right, dir)
+            if not all(pos in dict_board for pos in [next_left, next_right]):
+                return dict_board  # Can't move off board
+
+        # Move all boxes
+        for box in boxes_to_move:
+            # Clear old positions
+            dict_board[box.left] = "."
+            dict_board[box.right] = "."
+
+        # Update all box positions
+        for box in boxes_to_move:
+            box.move(dir)
+            dict_board[box.left] = "["
+            dict_board[box.right] = "]"
+
+        # Move robot
+        dict_board[next_pos] = "@"
+        dict_board[robot_pos] = "."
 
     return dict_board
 
@@ -128,18 +161,21 @@ def get_coord(pos):
     return 100 * pos[0] +  pos[1]
 
 viz_board(dict_board)
+
+boxes = get_boxes(dict_board)
 for move in moves:
     print("\nMove:", move)
     robot_pos = get_robot(dict_board)
-    dict_board = one_move(dict_board, robot_pos, move)
+    dict_board = one_move(dict_board, robot_pos, move, boxes)
     viz_board(dict_board)
 
-# tot = 0
-# for pos, v in dict_board.items():
-#     if v == "O":
-#         tot += get_coord(pos)
+
+tot = 0
+for pos, v in dict_board.items():
+    if v == "[":
+        tot += get_coord(pos)
 
 
 
-print("Part 1:", tot)
+print("Part 2:", tot)
 
