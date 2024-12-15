@@ -6,6 +6,10 @@ My solutions to the [Advent of Code](https://adventofcode.com/) puzzles.
 
 Here are some visualizations.
 
+## 2024 Day 14: Restroom Redoubt
+
+![2024-day14](./images/2024_day14.gif)
+
 ## 2023 Day 18: Lavaduct Ladgoon
 
 [https://adventofcode.com/2023/day/18](https://adventofcode.com/2023/day/18)
