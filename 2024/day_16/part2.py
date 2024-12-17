@@ -3,9 +3,8 @@ Reflections: Pruning fest...
 """
 from functools import cache, lru_cache
 from tqdm import tqdm
-from collections import defaultdict
+from collections import defaultdict, deque
 
-import heapq
 import random
 import utils
 
@@ -39,7 +38,7 @@ def get_visited_from_path(path_str):
 
 dir = "R"
 start_str = pos_dir_to_str(start_pos, dir)
-queue = [(0, start_str)]
+queue = deque([(0, start_str)])
 all_paths = []
 
 last_points_seen = 0
@@ -51,7 +50,7 @@ def dist_to_end(pos):
     return abs(pos[0] - end_pos[0]) + abs(pos[1] - end_pos[1])
 
 while queue:
-    points, path_str = heapq.heappop(queue)
+    points, path_str = queue.popleft()
     paths_checked += 1
 
     # Sanity log.
@@ -77,7 +76,7 @@ while queue:
 
     # 3. Prune if we can't possibly reach the end in the remaining points. With some
     # buffer.
-    if points + dist_to_end(pos) > min_points + 64:
+    if points + dist_to_end(pos) > min_points + 16:
         continue
 
     if pos == end_pos:
@@ -93,15 +92,15 @@ while queue:
     if new_pos in dict_board and dict_board[new_pos] != "#" and new_pos not in visited_pos:
         new_path = f"{path_str}:{pos_dir_to_str(new_pos, dir)}"
         if points + 1 <= min_points:
-            heapq.heappush(queue, (points + 1, new_path))
+            queue.append((points + 1, new_path))
 
     right_dir = utils.turn(dir, "R")
     left_dir = utils.turn(dir, "L")
     right_path = f"{path_str}:{pos_dir_to_str(pos, right_dir)}"
     left_path = f"{path_str}:{pos_dir_to_str(pos, left_dir)}"
     if points + 1000 <= min_points:
-        heapq.heappush(queue, (points + 1000, right_path))
-        heapq.heappush(queue, (points + 1000, left_path))
+        queue.append((points + 1000, right_path))
+        queue.append((points + 1000, left_path))
 
 
 def viz_board(dict_board, os):
