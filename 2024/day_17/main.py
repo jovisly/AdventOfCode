@@ -30,7 +30,7 @@ def get_operand_value(v, a, b, c):
     else:
         raise ValueError(f"Unknown operand: {v}")
 
-
+@cache
 def do_op(opcode, operand, a, b, c, instruction_pointer):
     out = None
     new_instruction_pointer = None
