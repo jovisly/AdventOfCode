@@ -20,18 +20,21 @@ func processLine(line string) (string, int) {
 	return direction, amount
 }
 
-func getModPos(pos int, num int) (int, int) {
-	if pos > 99 {
-		return getModPos(pos - 100, num + 1)
+func moveOne(pos int, direction string, amount int) int {
+	if direction == "L" {
+		newPos := pos - amount
+		if newPos < 0 {
+			newPos = 99
+		}
+		return newPos
+	} else {
+		newPos := pos + amount
+		if newPos > 99 {
+			newPos = 0
+		}
+		return newPos
 	}
-
-	if pos < 0 {
-		return getModPos(pos + 100, num + 1)
-	}
-
-	return pos, num
 }
-
 
 func main() {
 	lines := utils.ReadLines(FILENAME)
@@ -39,18 +42,12 @@ func main() {
 	count := 0
 	for _, line := range lines {
 		direction, amount := processLine(line)
-		if direction == "L" {
-			pos -= amount
-		} else {
-			pos += amount
+		for range amount {
+			pos = moveOne(pos, direction, 1)
 		}
-		// Wrap.
-		newPos, _ := getModPos(pos, 0)
-		// fmt.Println("The dial is roated: ", line, "pos: ", newPos)
-		if newPos == 0 {
+		if pos == 0 {
 			count++
 		}
-		pos = newPos
 	}
 	fmt.Println("Part 1: ", count)
 
@@ -59,26 +56,12 @@ func main() {
 	count = 0
 	for _, line := range lines {
 		direction, amount := processLine(line)
-		if direction == "L" {
-			pos -= amount
-		} else {
-			pos += amount
+		for range amount {
+			pos = moveOne(pos, direction, 1)
+			if pos == 0 {
+				count++
+			}
 		}
-		// Wrap.
-		newPos, num := getModPos(pos, 0)
-		fmt.Println("The dial is roated: ", line, "pos: ", newPos, "num: ", num)
-		count += num
-		// if newPos == 0 {
-		// 	count++
-		// }
-		pos = newPos
-	}
-
-	if pos == 0 {
-		count++
 	}
 	fmt.Println("Part 2: ", count)
 }
-
-// 2651 is wrong
-// 6671 is still wrong (and it's someone else's answer lol how)
