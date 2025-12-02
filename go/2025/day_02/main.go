@@ -25,7 +25,26 @@ func isValid(num int) bool {
 	return first != second
 }
 
-func sumInvalidDigits(part string) int {
+func isValidPart2(num int) bool {
+	str := strconv.Itoa(num)
+	lenStr := len(str)
+
+	for i := 0; i < lenStr/2+1; i++ {
+		subStr := str[:i]
+
+		if len(subStr) > 0 && lenStr%len(subStr) == 0 {
+			repeat := lenStr / len(subStr)
+			repeatedStr := strings.Repeat(subStr, repeat)
+			if repeatedStr == str {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func sumInvalidDigits(part string, partNum int) int {
 	// Split part by "-".
 	parts := strings.Split(part, "-")
 	num1, err := strconv.Atoi(parts[0])
@@ -41,26 +60,35 @@ func sumInvalidDigits(part string) int {
 	tot := 0
 	for num := num1; num <= num2; num++ {
 		// Check if the number is invalid.
-		if !isValid(num) {
-			tot += num
+		if partNum == 1 {
+			if !isValid(num) {
+				tot += num
+			}
+		} else {
+			if !isValidPart2(num) {
+				tot += num
+			}
 		}
 	}
 	return tot
 }
 
-func processLine(line string) int {
+func processLine(line string, partNum int) int {
 	// Split the line by commas.
 	parts := strings.Split(line, ",")
 	tot := 0
 	for _, part := range parts {
-		tot += sumInvalidDigits(part)
+		tot += sumInvalidDigits(part, partNum)
 	}
 	return tot
 }
 
 func main() {
 	lines := utils.ReadLines(FILENAME)
-	// IMPLEMENT
-	fmt.Println("Part 1: ", processLine(lines[0]))
-	fmt.Println("Part 2: ", len(lines))
+	fmt.Println("Part 1: ", processLine(lines[0], 1))
+	fmt.Println("Part 2: ", processLine(lines[0], 2))
+
+	// fmt.Print(isValidPart2(12345))
+	// fmt.Print(isValidPart2(1234512345))
+	// fmt.Print(isValidPart2(123451234))
 }
