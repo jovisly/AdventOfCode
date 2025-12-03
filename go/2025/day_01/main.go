@@ -20,7 +20,8 @@ func processLine(line string) (string, int) {
 	return direction, amount
 }
 
-func moveOne(pos int, direction string, amount int) int {
+func moveOne(pos int, direction string) int {
+	amount := 1
 	if direction == "L" {
 		newPos := pos - amount
 		if newPos < 0 {
@@ -43,7 +44,7 @@ func main() {
 	for _, line := range lines {
 		direction, amount := processLine(line)
 		for range amount {
-			pos = moveOne(pos, direction, 1)
+			pos = moveOne(pos, direction)
 		}
 		if pos == 0 {
 			count++
@@ -57,7 +58,7 @@ func main() {
 	for _, line := range lines {
 		direction, amount := processLine(line)
 		for range amount {
-			pos = moveOne(pos, direction, 1)
+			pos = moveOne(pos, direction)
 			if pos == 0 {
 				count++
 			}
