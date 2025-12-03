@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-const FILENAME = "input_test.txt"
+const FILENAME = "input.txt"
 
 func processLine(line string) int {
 	currMax := 0
@@ -36,40 +36,44 @@ func processLines(lines []string) int {
 	return tot
 }
 
-// remove characters from a string at the specified indices
-func removeIndices(s string, indices []int) string {
-	result := ""
-	for i := range s {
-		shouldRemove := false
-		for _, idx := range indices {
-			if i == idx {
-				shouldRemove = true
-				break
-			}
+// 12 + 1: iterate through the string to remove one character and see if it's the biggest.
+func getMaxS(s string) string {
+	maxS := ""
+	maxSInt := 0
+	for i := range len(s) {
+		sMinusChar := s[:i] + s[i+1:]
+		sMinusCharInt, err := strconv.Atoi(sMinusChar)
+		if err != nil {
+			panic(err)
 		}
-		if !shouldRemove {
-			result += string(s[i])
+		if sMinusCharInt > maxSInt {
+			maxS = sMinusChar
+			maxSInt = sMinusCharInt
 		}
 	}
-	return result
+	return maxS
 }
 
 func processLinePart2(line string) int {
 	currMax := 0
-	lenLine := len(line)
-	for i := range lenLine {
-		for j := i + 1; j < lenLine; j++ {
-			for k := j + 1; k < lenLine; k++ {
-				indices := []int{i, j, k}
-				newLine := removeIndices(line, indices)
-				newInt, err := strconv.Atoi(newLine)
-				if err != nil {
-					panic(err)
-				}
-				currMax = max(currMax, newInt)
-			}
+	n := 12
+
+	// Take the last 12 characters.
+	s := line[len(line)-n:]
+
+	// Reverse iterate through the rest of the string.
+	for i := len(line) - n - 1; i >= 0; i-- {
+		char := string(line[i])
+		sPlusChar := char + s
+		maxSPlusChar := getMaxS(sPlusChar)
+		maxSPlusCharInt, err := strconv.Atoi(maxSPlusChar)
+		if err != nil {
+			panic(err)
 		}
+		currMax = max(currMax, maxSPlusCharInt)
+		s = maxSPlusChar
 	}
+
 	return currMax
 }
 
