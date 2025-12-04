@@ -68,9 +68,40 @@ func GetNeighbors4(board Board, pos P) []P {
 	return neighbors
 }
 
+func GetNeighbors8(board Board, pos P) []P {
+	// Start with the 4 cardinal neighbors
+	neighbors := GetNeighbors4(board, pos)
+
+	// Add the 4 diagonal neighbors
+	diagonals := []P{
+		{pos[0] - 1, pos[1] - 1},
+		{pos[0] - 1, pos[1] + 1},
+		{pos[0] + 1, pos[1] - 1},
+		{pos[0] + 1, pos[1] + 1},
+	}
+
+	for _, diag := range diagonals {
+		_, exists := board[diag]
+		if exists {
+			neighbors = append(neighbors, diag)
+		}
+	}
+
+	return neighbors
+}
+
 // Return the values of a position's 4 neighbors.
 func GetNeighborValues4(board Board, pos P) []string {
 	neighbors := GetNeighbors4(board, pos)
+	values := []string{}
+	for _, neighbor := range neighbors {
+		values = append(values, board[neighbor])
+	}
+	return values
+}
+
+func GetNeighborValues8(board Board, pos P) []string {
+	neighbors := GetNeighbors8(board, pos)
 	values := []string{}
 	for _, neighbor := range neighbors {
 		values = append(values, board[neighbor])
