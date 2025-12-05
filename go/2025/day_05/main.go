@@ -3,7 +3,6 @@ package main
 import (
 	"aoc/utils"
 	"fmt"
-	"slices"
 	"strconv"
 	"strings"
 )
@@ -11,25 +10,29 @@ import (
 const FILENAME = "input.txt"
 
 
-func processRanges(ranges []string) []int {
-	ingredients := []int{}
-	for _, r := range ranges {
-		parts := strings.Split(r, "-")
-		min, err := strconv.Atoi(parts[0])
-		if err != nil {
-			panic(err)
-		}
-		max, err := strconv.Atoi(parts[1])
-		if err != nil {
-			panic(err)
-		}
-		for i := min; i <= max; i++ {
-			if !slices.Contains(ingredients, i) {
-				ingredients = append(ingredients, i)
-			}
-		}
+func isFresh(ingredient string, ranges []string) bool {
+	if len(ingredient) == 0 {
+		return false
 	}
-	return ingredients
+    intIngredient, err := strconv.Atoi(ingredient)
+    if err != nil {
+        panic(err)
+    }
+    for _, r := range ranges {
+        parts := strings.Split(r, "-")
+        min, err := strconv.Atoi(parts[0])
+        if err != nil {
+            panic(err)
+        }
+        max, err := strconv.Atoi(parts[1])
+        if err != nil {
+            panic(err)
+        }
+        if intIngredient >= min && intIngredient <= max {
+            return true
+        }
+    }
+    return false
 }
 
 
@@ -39,10 +42,10 @@ func main() {
 	ranges := strings.Split(parts[0], "\n")
 	ingredients := strings.Split(parts[1], "\n")
 
-	freshIngredients := processRanges(ranges)
 	num := 0
-	for ingredient := range ingredients {
-		if slices.Contains(freshIngredients, ingredient) {
+	for _, ingredient := range ingredients {
+		// fmt.Println(ingredient)
+		if isFresh(ingredient, ranges) {
 			num += 1
 		}
 	}
