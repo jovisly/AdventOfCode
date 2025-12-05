@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"io"
 	"log"
 	"os"
 )
@@ -26,6 +27,23 @@ func ReadLines(filename string) []string {
 
 	return lines
 }
+
+// ReadFile reads the entire file as a single string.
+func ReadFile(filename string) string {
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	content, err := io.ReadAll(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(content)
+}
+
 
 // P represents a point (i, j) on a board.
 type P [2]int
