@@ -4,29 +4,18 @@ package main
 import (
 	"aoc/utils"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 )
 
 const FILENAME = "input.txt"
 
-func cleanStrings(list_s []string) []string {
-	cleaned := []string{}
-	for _, s := range list_s {
-		trimmed := strings.TrimSpace(s)
-		if trimmed != "" {
-			cleaned = append(cleaned, trimmed)
-		}
-	}
-	return cleaned
-}
-
 func processLinesP1(lines []string) int {
 	processedLines := [][]string{}
 	for _, line := range lines {
-		segs := strings.Split(line, " ")
-		cleanedSegs := cleanStrings(segs)
-		processedLines = append(processedLines, cleanedSegs)
+		segs := strings.Fields(line)
+		processedLines = append(processedLines, segs)
 	}
 
 	// fmt.Printf("%#v\n", processedLines)
@@ -41,7 +30,7 @@ func processLinesP1(lines []string) int {
 		}
 
 		for _, line := range processedLines[:len(processedLines)-1] {
-			num, err := strconv.Atoi(strings.TrimSpace(string(line[i])))
+			num, err := strconv.Atoi(line[i])
 			if err != nil {
 				panic(err)
 			}
@@ -61,12 +50,8 @@ func processLinesP1(lines []string) int {
 
 func processLinesP2(lines []string) int {
 	opsString := lines[len(lines)-1]
-	ops := strings.Split(opsString, " ")
-	ops = cleanStrings(ops)
-	// Reverse
-	for i, j := 0, len(ops)-1; i < j; i, j = i+1, j-1 {
-		ops[i], ops[j] = ops[j], ops[i]
-	}
+	ops := strings.Fields(opsString)
+	slices.Reverse(ops)
 
 	// fmt.Printf("%#v\n", ops)
 
