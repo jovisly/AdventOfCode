@@ -6,8 +6,6 @@ import (
 	"slices"
 )
 
-const FILENAME = "input.txt"
-
 func getStart(board utils.Board) utils.P {
 	for pos, value := range board {
 		if value == "S" {
@@ -54,7 +52,7 @@ func moveAllBeams(beams []utils.P, board utils.Board) ([]utils.P, int) {
 	return allNewBeams, numSplits
 }
 
-func main() {
+func Part1() {
 	lines := utils.ReadLines(FILENAME)
 	board := utils.GetBoard(lines)
 	sPos := getStart(board)
