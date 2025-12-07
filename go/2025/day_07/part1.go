@@ -8,7 +8,6 @@ import (
 
 const FILENAME = "input.txt"
 
-
 func getStart(board utils.Board) utils.P {
 	for pos, value := range board {
 		if value == "S" {
@@ -31,7 +30,6 @@ func moveBeam(beam utils.P, board utils.Board) []utils.P {
 	// Just return single item slice with just nextPos
 	return []utils.P{nextPos}
 }
-
 
 // Move all the beams to next iteration. Returns tuple of new beams and num splits.
 func moveAllBeams(beams []utils.P, board utils.Board) ([]utils.P, int) {
@@ -56,7 +54,6 @@ func moveAllBeams(beams []utils.P, board utils.Board) ([]utils.P, int) {
 	return allNewBeams, numSplits
 }
 
-
 func main() {
 	lines := utils.ReadLines(FILENAME)
 	board := utils.GetBoard(lines)
@@ -76,18 +73,12 @@ func main() {
 		tot += numSplits
 
 		// If we have reached the bottom, break.
-		if newBeams[0][0] == len(lines) - 1 {
+		if newBeams[0][0] == len(lines)-1 {
 			break
 		}
 
 		beams = newBeams
 	}
 
-
-
-	// utils.VisualizeBoard(board)
-	// IMPLEMENT
-	// it's not 1700
 	fmt.Println("Part 1: ", tot)
-	// fmt.Println("Part 2: ", len(lines))
 }
