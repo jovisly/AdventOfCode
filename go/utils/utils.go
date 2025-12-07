@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -125,4 +126,29 @@ func GetNeighborValues8(board Board, pos P) []string {
 		values = append(values, board[neighbor])
 	}
 	return values
+}
+
+
+func VisualizeBoard(board Board) {
+	if len(board) == 0 {
+		return
+	}
+
+	maxRow, maxCol := 0, 0
+	for pos := range board {
+		if pos[0] > maxRow {
+			maxRow = pos[0]
+		}
+		if pos[1] > maxCol {
+			maxCol = pos[1]
+		}
+	}
+
+	for i := 0; i <= maxRow; i++ {
+		line := ""
+		for j := 0; j <= maxCol; j++ {
+			line += board[P{i, j}]
+		}
+		fmt.Println(line)
+	}
 }
