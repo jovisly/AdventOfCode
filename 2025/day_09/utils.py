@@ -184,3 +184,59 @@ def get_num_sides(block):
                             to_visit.append((neighbor, current_dir))
 
     return sides
+
+
+def find_inside_positions(
+    dict_board,
+    boundary_char="X",
+    empty_char="."
+):
+    """Find all positions that are inside boundaries.
+
+    Returns:
+        Set of (x, y) positions that are inside.
+    """
+    if not dict_board:
+        return set()
+
+    max_x = max([p[0] for p in dict_board.keys()])
+    max_y = max([p[1] for p in dict_board.keys()])
+
+    # Start from all edge positions that are empty
+    queue = []
+    for x in range(max_x + 1):
+        if dict_board.get((x, 0)) == empty_char:
+            queue.append((x, 0))
+        if dict_board.get((x, max_y)) == empty_char:
+            queue.append((x, max_y))
+    for y in range(max_y + 1):
+        if dict_board.get((0, y)) == empty_char:
+            queue.append((0, y))
+        if dict_board.get((max_x, y)) == empty_char:
+            queue.append((max_x, y))
+
+    # BFS to mark all reachable positions as outside
+    outside_positions = set()
+    visited = set()
+
+    while queue:
+        pos = queue.pop(0)
+        if pos in visited:
+            continue
+        visited.add(pos)
+        outside_positions.add(pos)
+
+        # Check neighbors
+        x, y = pos
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            new_pos = (x + dx, y + dy)
+            if (new_pos in dict_board and
+                dict_board[new_pos] == empty_char and
+                new_pos not in visited):
+                queue.append(new_pos)
+
+    # All empty positions that are NOT outside must be inside
+    all_empty = {pos for pos, val in dict_board.items() if val == empty_char}
+    inside_positions = all_empty - outside_positions
+
+    return inside_positions

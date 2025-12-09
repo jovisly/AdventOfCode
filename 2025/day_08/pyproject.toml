@@ -6,4 +6,5 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "networkx>=3.6",
+    "tqdm>=4.67.1",
 ]

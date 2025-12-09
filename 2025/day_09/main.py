@@ -1,9 +1,10 @@
 from collections import defaultdict
+from tqdm import tqdm
 
 import utils
 
 filename = "input.txt"
-filename = "input-test.txt"
+# filename = "input-test.txt"
 lines = open(filename, encoding="utf-8").read().splitlines()
 list_pos = [tuple(int(p) for p in line.split(",")) for line in lines]
 
@@ -33,9 +34,10 @@ for pos in list_pos:
     dict_board[pos] = "R"
 
 
-utils.viz_board(dict_board)
-print("")
+# utils.viz_board(dict_board)
+# print("")
 
+print("Filling in X positions...")
 # Find x positions that have at least 2 occurrences.
 dict_x_count = defaultdict(int)
 for pos in list_pos:
@@ -51,9 +53,10 @@ for x in list_x:
     for y in range(min_y, max_y + 1):
         dict_board[(x, y)] = "G"
 
-utils.viz_board(dict_board)
-print("")
+# utils.viz_board(dict_board)
+# print("")
 
+print("Filling in Y positions...")
 # Find the Y positions that have at least 2 occurrences.
 dict_y_count = defaultdict(int)
 for pos in list_pos:
@@ -68,56 +71,47 @@ for y in list_y:
         dict_board[(x, y)] = "G"
 
 
-utils.viz_board(dict_board)
-print("")
+# utils.viz_board(dict_board)
+# print("")
 
-# For every point, we want to see if it's "inside". That means it should find a G before AND after it.
+print("Finding inside positions...")
+inside_pos = utils.find_inside_positions(dict_board=dict_board, boundary_char="G")
 
-def is_inside(dict_board, pos):
-    if dict_board[pos] == "G":
-        return False
-    # if dict_board[pos] != "." and dict_board[pos] != "i":
-    #     return True
+for pos in inside_pos:
+    dict_board[pos] = "i"
 
-    # Ray casting: cast rays in all four directions and count G borders.
-    # If odd number of crossings in ALL directions, we're inside; otherwise outside.
-    gs_left = len([
-        p for p in list(dict_board.keys())
-        if p[0] == pos[0] and p[1] < pos[1] and dict_board[p] == "G"
-    ])
-    gs_right = len([
-        p for p in list(dict_board.keys())
-        if p[0] == pos[0] and p[1] > pos[1] and dict_board[p] == "G"
-    ])
-    gs_up = len([
-        p for p in list(dict_board.keys())
-        if p[0] < pos[0] and p[1] == pos[1] and dict_board[p] == "G"
-    ])
-    gs_down = len([
-        p for p in list(dict_board.keys())
-        if p[0] > pos[0] and p[1] == pos[1] and dict_board[p] == "G"
-    ])
+# utils.viz_board(dict_board)
+# print("")
 
-    # print("?????")
-    # print(gs_left, gs_right, gs_up, gs_down)
+eligible_pos = set([pos for pos in dict_board.keys() if dict_board[pos] != "."])
 
-    # Inside if odd number of crossings in ALL directions
-    return (gs_left % 2 == 1 and
-            gs_right % 2 == 1 and
-            gs_up % 2 == 1 and
-            gs_down % 2 == 1)
+# Then we check every pairwise combination.
+# Warning it might be slow!
+
+def get_area(pos1, pos2):
+    x_min = min(pos1[0], pos2[0])
+    x_max = max(pos1[0], pos2[0])
+    y_min = min(pos1[1], pos2[1])
+    y_max = max(pos1[1], pos2[1])
+    for x in range(x_min, x_max + 1):
+        for y in range(y_min, y_max + 1):
+            if (x, y) not in eligible_pos:
+                return 0
+
+    return (x_max - x_min + 1) * (y_max - y_min + 1)
 
 
-# dict_board[(4, 4)] = "i"
-# res = is_inside(dict_board, (3, 4))
-# print(res)
+max_area = 0
+for i in tqdm(range(len(list_pos))):
+    for j in tqdm(range(len(list_pos))):
+        if i == j:
+            continue
+
+        pos1 = list_pos[i]
+        pos2 = list_pos[j]
+        area = get_area(pos1, pos2)
+        if area > max_area:
+            max_area = area
 
 
-for pos in list(dict_board.keys()):
-    if is_inside(dict_board, pos):
-        dict_board[pos] = "i"
-
-utils.viz_board(dict_board)
-print("")
-
-print("Part 2:")
+print("Part 2:", max_area)
