@@ -1,3 +1,4 @@
+# TOO SLOW!!
 import heapq
 from tqdm import tqdm
 import utils
