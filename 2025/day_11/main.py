@@ -51,28 +51,38 @@ def get_graph(dict_device):
     return G
 
 def count_paths(start, end, dict_device, graph):
+    # Only consider nodes that can reach end.
     eligible = nx.ancestors(graph, end) | {end}
 
-    # Early exit if start can't reach end
     if start not in eligible:
         return 0
 
-    queue = deque([(start, [start])])
-    all_paths = []
+    # Only count path; don't track them.
+    path_counts = {start: 1}
+    queue = deque([start])
+    visited = {start}
 
     while queue:
-        current, path = queue.popleft()
+        current = queue.popleft()
 
         if current == end:
-            all_paths.append(path)
             continue
 
         neighbors = dict_device.get(current, [])
         for neighbor in neighbors:
-            # Must be eligible.
-            if neighbor not in path and neighbor in eligible:
-                queue.append((neighbor, path + [neighbor]))
-    return len(all_paths)
+            if neighbor in eligible:
+                # Add paths: all paths to current also lead to neighbor
+                if neighbor not in path_counts:
+                    path_counts[neighbor] = 0
+
+                path_counts[neighbor] += path_counts[current]
+
+                # Add to queue if we haven't seen it yet
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append(neighbor)
+
+    return path_counts.get(end, 0)
 
 
 filename = "input.txt"
