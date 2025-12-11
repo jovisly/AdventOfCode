@@ -61,9 +61,19 @@ graph = get_graph(dict_device)
 
 start = "svr"
 end = "out"
-all_paths = list(nx.all_simple_paths(graph, start, end))
 
-# print("all_paths:", all_paths)
+# https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.dag.ancestors.html
+can_reach_out = nx.ancestors(graph, end)
+print("num nodes can reach out:", len(can_reach_out))
+# print("can_reach_out:", can_reach_out)
+
+dict_device_reduced = {k: v for k, v in dict_device.items() if k in can_reach_out or k == end}
+graph_reduced = get_graph(dict_device_reduced)
+print("built reduced graph")
+
+all_paths = list(nx.all_simple_paths(graph_reduced, start, end))
+print("found all paths")
+
 reduced_paths = [
     p for p in all_paths if "dac" in p and "fft" in p
 ]
