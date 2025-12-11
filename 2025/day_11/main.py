@@ -50,11 +50,11 @@ def get_graph(dict_device):
             G.add_edge(node, neighbor)
     return G
 
-def count_paths(start, end, dict_device, can_reach_end):
-    eligible = can_reach_end | {end}
+def count_paths(start, end, dict_device, graph):
+    eligible = nx.ancestors(graph, end) | {end}
 
     # Early exit if start can't reach end
-    if start not in can_reach_end:
+    if start not in eligible:
         return 0
 
     queue = deque([(start, [start])])
@@ -81,22 +81,21 @@ lines = open(filename, encoding="utf-8").read().splitlines()
 
 dict_device = process_lines(lines)
 graph = get_graph(dict_device)
-can_reach_end = nx.ancestors(graph, end)
 
 # "svr" -> "dac" -> "fft" -> "out"
 print("svr to dac")
-a = count_paths("svr", "dac", dict_device, can_reach_end)
+a = count_paths("svr", "dac", dict_device, graph)
 print("dac to fft")
-b = count_paths("dac", "fft", dict_device, can_reach_end)
+b = count_paths("dac", "fft", dict_device, graph)
 print("fft to out")
-c = count_paths("fft", "out", dict_device, can_reach_end)
+c = count_paths("fft", "out", dict_device, graph)
 
 # "svr" -> "fft" -> "dac" -> "out"
 print("svr to fft")
-d = count_paths("svr", "fft", dict_device, can_reach_end)
+d = count_paths("svr", "fft", dict_device, graph)
 print("fft to dac")
-e = count_paths("fft", "dac", dict_device, can_reach_end)
+e = count_paths("fft", "dac", dict_device, graph)
 print("dac to out")
-f = count_paths("dac", "out", dict_device, can_reach_end)
+f = count_paths("dac", "out", dict_device, graph)
 
 print("Part 2:", a * b * c + d * e * f)
