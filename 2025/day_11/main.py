@@ -41,7 +41,22 @@ print("Part 1:", len(all_paths))
 
 
 # Part 2: Tried a few iterations...
-def count_paths(start, end):
+import networkx as nx
+
+def get_graph(dict_device):
+    G = nx.DiGraph()
+    for node, neighbors in dict_device.items():
+        for neighbor in neighbors:
+            G.add_edge(node, neighbor)
+    return G
+
+def count_paths(start, end, dict_device, can_reach_end):
+    eligible = can_reach_end | {end}
+
+    # Early exit if start can't reach end
+    if start not in can_reach_end:
+        return 0
+
     queue = deque([(start, [start])])
     all_paths = []
 
@@ -54,8 +69,8 @@ def count_paths(start, end):
 
         neighbors = dict_device.get(current, [])
         for neighbor in neighbors:
-            # No looping bac.
-            if neighbor not in path:
+            # Must be eligible.
+            if neighbor not in path and neighbor in eligible:
                 queue.append((neighbor, path + [neighbor]))
     return len(all_paths)
 
@@ -65,21 +80,23 @@ filename = "input.txt"
 lines = open(filename, encoding="utf-8").read().splitlines()
 
 dict_device = process_lines(lines)
+graph = get_graph(dict_device)
+can_reach_end = nx.ancestors(graph, end)
 
 # "svr" -> "dac" -> "fft" -> "out"
 print("svr to dac")
-a = count_paths("svr", "dac")
+a = count_paths("svr", "dac", dict_device, can_reach_end)
 print("dac to fft")
-b = count_paths("dac", "fft")
+b = count_paths("dac", "fft", dict_device, can_reach_end)
 print("fft to out")
-c = count_paths("fft", "out")
+c = count_paths("fft", "out", dict_device, can_reach_end)
 
 # "svr" -> "fft" -> "dac" -> "out"
 print("svr to fft")
-d = count_paths("svr", "fft")
+d = count_paths("svr", "fft", dict_device, can_reach_end)
 print("fft to dac")
-e = count_paths("fft", "dac")
+e = count_paths("fft", "dac", dict_device, can_reach_end)
 print("dac to out")
-f = count_paths("dac", "out")
+f = count_paths("dac", "out", dict_device, can_reach_end)
 
 print("Part 2:", a * b * c + d * e * f)
