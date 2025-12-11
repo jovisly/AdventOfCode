@@ -39,35 +39,29 @@ while queue:
 
 print("Part 1:", len(all_paths))
 
+# Part 2: Same approach doesn't work (too slow).
+# Try networkx
+# https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.simple_paths.all_simple_paths.html
+import networkx as nx
 
+def get_graph(dict_device):
+    G = nx.DiGraph()
+    for node, neighbors in dict_device.items():
+        for neighbor in neighbors:
+            G.add_edge(node, neighbor)
+    return G
 
-
-# Part 2: Same but just different start, plus we check paths at the end.
 
 filename = "input.txt"
 # filename = "input-test2.txt"
 lines = open(filename, encoding="utf-8").read().splitlines()
 
 dict_device = process_lines(lines)
+graph = get_graph(dict_device)
 
 start = "svr"
 end = "out"
-queue = deque([(start, [start])])
-all_paths = []
-
-while queue:
-    current, path = queue.popleft()
-
-    if current == end:
-        all_paths.append(path)
-        continue
-
-    neighbors = dict_device.get(current, [])
-    for neighbor in neighbors:
-        # No looping bac.
-        if neighbor not in path:
-            queue.append((neighbor, path + [neighbor]))
-
+all_paths = list(nx.all_simple_paths(graph, start, end))
 
 # print("all_paths:", all_paths)
 reduced_paths = [
