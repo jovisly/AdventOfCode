@@ -39,17 +39,25 @@ while queue:
 
 print("Part 1:", len(all_paths))
 
-# Part 2: Same approach doesn't work (too slow).
-# Try networkx
-# https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.simple_paths.all_simple_paths.html
-import networkx as nx
 
-def get_graph(dict_device):
-    G = nx.DiGraph()
-    for node, neighbors in dict_device.items():
+# Part 2: Tried a few iterations...
+def count_paths(start, end):
+    queue = deque([(start, [start])])
+    all_paths = []
+
+    while queue:
+        current, path = queue.popleft()
+
+        if current == end:
+            all_paths.append(path)
+            continue
+
+        neighbors = dict_device.get(current, [])
         for neighbor in neighbors:
-            G.add_edge(node, neighbor)
-    return G
+            # No looping bac.
+            if neighbor not in path:
+                queue.append((neighbor, path + [neighbor]))
+    return len(all_paths)
 
 
 filename = "input.txt"
@@ -57,25 +65,21 @@ filename = "input.txt"
 lines = open(filename, encoding="utf-8").read().splitlines()
 
 dict_device = process_lines(lines)
-graph = get_graph(dict_device)
 
-start = "svr"
-end = "out"
+# "svr" -> "dac" -> "fft" -> "out"
+print("svr to dac")
+a = count_paths("svr", "dac")
+print("dac to fft")
+b = count_paths("dac", "fft")
+print("fft to out")
+c = count_paths("fft", "out")
 
-# https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.dag.ancestors.html
-can_reach_out = nx.ancestors(graph, end)
-print("num nodes can reach out:", len(can_reach_out))
-# print("can_reach_out:", can_reach_out)
+# "svr" -> "fft" -> "dac" -> "out"
+print("svr to fft")
+d = count_paths("svr", "fft")
+print("fft to dac")
+e = count_paths("fft", "dac")
+print("dac to out")
+f = count_paths("dac", "out")
 
-dict_device_reduced = {k: v for k, v in dict_device.items() if k in can_reach_out or k == end}
-graph_reduced = get_graph(dict_device_reduced)
-print("built reduced graph")
-
-all_paths = list(nx.all_simple_paths(graph_reduced, start, end))
-print("found all paths")
-
-reduced_paths = [
-    p for p in all_paths if "dac" in p and "fft" in p
-]
-
-print("Part 2:", len(reduced_paths))
+print("Part 2:", a * b * c + d * e * f)
